@@ -17,7 +17,7 @@ const Top = () => {
             alt='logo' />
             </div>
             </Link>
-            <div className='relative flex w-full h-[49.5px]'>
+            <div className='relative flex w-full h-[49.8px]'>
             <Circle />
             <Circle />
             <Circle />
@@ -32,6 +32,7 @@ const Top = () => {
 
 
 export default Top
+
 
 
 
