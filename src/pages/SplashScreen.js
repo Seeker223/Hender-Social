@@ -6,9 +6,9 @@ import { Link } from 'react-router-dom'
 const SplashScreen = () => {
   return (
     <div className='h-screen bg-white-500 md:bg-blue-500 lg:bg-green-500 bg-center flex justify-center items-center'>
-    <div className='h-screen flex flex-col justify-center items-center border-2 border-red-500'>
+    <div className='h-screen flex flex-col justify-center items-center'>
             <Link to='/home'>
-              <div className='border-2 border-red-500'>
+              <div className=''>
                   <img
                     src={hlogo2}
                     width={180}
@@ -25,3 +25,4 @@ const SplashScreen = () => {
 }
 
 export default SplashScreen
+
