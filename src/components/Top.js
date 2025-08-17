@@ -9,9 +9,9 @@ import { Link } from 'react-router-dom'
 
 const Top = () => {
   return (
-    <div className=' relative flex w-full h-[14px]'>
+    <div className=' relative flex w-full h-[60px]'>
       <Link to='/home/userId'>
-           <div className='relative flex  h-full w-14px  '>
+           <div className='relative flex  h-full w-[3rem]  '>
             <img src={hlogo2} 
             className=' h-full w-full  object-contain '
             alt='logo' />
@@ -32,4 +32,5 @@ const Top = () => {
 
 
 export default Top
+
 
