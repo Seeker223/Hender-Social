@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom'
 
 const Top = () => {
   return (
-    <div className=' relative flex w-full h-[60px]'>
+    <div className=' relative flex w-full h-[14px]'>
       <Link to='/home/userId'>
            <div className='relative flex  h-full w-14px  '>
             <img src={hlogo2} 
@@ -32,3 +32,4 @@ const Top = () => {
 
 
 export default Top
+
