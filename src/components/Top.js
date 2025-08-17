@@ -17,7 +17,7 @@ const Top = () => {
             alt='logo' />
             </div>
             </Link>
-            <div className=' relative scroll-smooth overflow-x-scroll flex w-full h-[60px]'>
+            <div className=' relative scroll-smooth overflow-x-scroll flex w-auto h-[60px]'>
             <Circle />
             <Circle />
             <Circle />
@@ -32,5 +32,6 @@ const Top = () => {
 
 
 export default Top
+
 
 
