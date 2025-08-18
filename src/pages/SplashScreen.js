@@ -1,6 +1,7 @@
 import React from 'react'
 import '../pages/SplashScreen.css'
 import hlogo2 from '../assets/hlogo2.png'
+import hender_xender from '../assets/hender_xender.png'
 import { Link } from 'react-router-dom'
 
 const SplashScreen = () => {
@@ -10,7 +11,7 @@ const SplashScreen = () => {
             <Link to='/home'>
               <div className=''>
                   <img
-                    src={hlogo2}
+                    src={hender_xender}
                     width={180}
                     height={180}
                     alt='logo'
@@ -25,6 +26,7 @@ const SplashScreen = () => {
 }
 
 export default SplashScreen
+
 
 
 
