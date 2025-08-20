@@ -12,8 +12,8 @@ const SplashScreen = () => {
               <div className=''>
                   <img
                     src={hender_xender}
-                    width={90}
-                    height={90}
+                    width={120}
+                    height={120}
                     alt='logo'
                   />
               </div>
@@ -26,6 +26,7 @@ const SplashScreen = () => {
 }
 
 export default SplashScreen
+
 
 
 
