@@ -19,6 +19,10 @@ const SplashScreen = () => {
               </div>
            </Link>
                 <h1 className="w-full text-2xl font-bold">Hender Xender</h1>
+                <h1 className="w-full text-2xl font-bold">i am social</h1>
+               <h1 className="w-full text-2xl font-bold">Powered by needforsoftwares</h1>
+       
+                      
     </div>
     
     </div>
@@ -26,6 +30,7 @@ const SplashScreen = () => {
 }
 
 export default SplashScreen
+
 
 
 
