@@ -22,14 +22,13 @@ const SplashScreen = () => {
                 
                       
     </div>
-    <h1 className="w-full text-2xl font-bold">i am social</h1>
-               <h1 className="w-full text-2xl font-bold">Powered by needforsoftwares</h1>
-       
+    
     </div>
   )
 }
 
 export default SplashScreen
+
 
 
 
