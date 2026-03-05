@@ -10,6 +10,7 @@ const Bottom = () => {
     <section className='relative h-[calc(100%-4rem)] w-full'>
       <IconContainer />
       <div className='relative flex h-[calc(100%-3rem)] w-full'>
+       
         <Left />
         <Right />
       </div>
