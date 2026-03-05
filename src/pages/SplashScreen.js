@@ -1,6 +1,5 @@
 import React from 'react'
 import '../pages/SplashScreen.css'
-import hlogo2 from '../assets/hlogo2.png'
 import hender_xender from '../assets/hender_xender.png'
 import { Link } from 'react-router-dom'
 
