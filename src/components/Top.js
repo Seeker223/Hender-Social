@@ -1,7 +1,6 @@
 import React from 'react'
 import hlogo2 from '../assets/hlogo2.png'
 import Circle from '../components/Circle'
-import avatar from '../assets/avatar.png'
 import { Link } from 'react-router-dom'
 
 
@@ -9,24 +8,19 @@ import { Link } from 'react-router-dom'
 
 const Top = () => {
   return (
-    <div className=' relative flex w-full h-[60px]'>
-      <Link to='/home/userId'>
-           <div className='relative flex  h-full w-[3rem]  '>
-            <img src={hlogo2} 
-            className=' h-full w-full  object-contain '
-            alt='logo' />
-            </div>
-            </Link>
-            <div className='relative flex w-full h-[52px]'>
-            <Circle />
-            <Circle />
-            <Circle />
-            <Circle />
-            <Circle />
-            <Circle />
-            
-            </div>
-        </div>
+    <header className='flex h-16 w-full items-center gap-2 border-b border-[#ff2c7b] bg-[#efefef] px-1'>
+      <Link to='/home/left' className='h-12 w-12 shrink-0'>
+        <img src={hlogo2} className='h-full w-full object-contain' alt='logo' />
+      </Link>
+      <div className='flex flex-1 items-center gap-1 overflow-x-auto pr-1'>
+        <Circle size='h-12 w-12' className='shrink-0' />
+        <Circle size='h-12 w-12' className='shrink-0' />
+        <Circle size='h-12 w-12' className='shrink-0' />
+        <Circle size='h-12 w-12' className='shrink-0' />
+        <Circle size='h-12 w-12' className='shrink-0' />
+        <Circle size='h-12 w-12' className='shrink-0' />
+      </div>
+    </header>
   )
 }
 

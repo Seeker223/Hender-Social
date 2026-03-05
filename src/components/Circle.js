@@ -2,13 +2,13 @@ import React from 'react'
 import avatar from '../assets/avatar.png'
 
 
-const Circle = (props) => {
+const Circle = ({ size = 'h-10 w-10', className = '' }) => {
   return (
-
-            <img src={avatar} 
-            className='cursor-pointer border-2 border-red-500 rounded-full object-cover '
-            alt='logo' />
-    
+    <img
+      src={avatar}
+      className={`${size} ${className} cursor-pointer rounded-full border-2 border-[#ff2c7b] object-cover`}
+      alt='avatar'
+    />
   )
 }
 

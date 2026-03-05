@@ -13,28 +13,22 @@ import avatar from '../assets/avatar.png'
 
 const LeftRoutes = () => {
   return (
-   
-    <>
-    
-    <div className="relative overflow-y-scroll h-[41rem]  w-[80%]">
-        
-        <Post name='ztsambad' img={hlogo2} text='efjfhjkfvdzjhnmcckn,mcn,xnc.xjfkllcjdxcnnfdk,.fdfffffffd' react='21'/>
-        <Post name=''  img={p1} text='' react='4'/>
-        <Post name='' img={avatar} text='' react='44'/>
-        <Post name='' img={p2} text='' react='34'/>
-        <Post name='' img={p3} text='' react='78'/>
-        <Post name='' img={p4} text='' react='68'/>
-        <Post name='' img={p5} text='' react='999'/>
-        <Post name='' img={p6} text='' react='766'/>
-        <Post name='' img={p7} text='' react='5555'/>
-        <Post name='' img={p8} text='' react='457'/>
-        <Post name='' img={p1} text='' react='455'/>
-        <Post name='' img={p2} text='' react='665'/>
-        <Post name='' img={p3} text='' react='554'/>
-        <Post name='' img={p4} text='' react='677'/>
-        </div>
-        </>  
-    
+    <section className='h-full w-full overflow-y-auto bg-[#ececec]'>
+      <Post name='ztsambad' img={hlogo2} text='efjfhjkfvdzjhnmcckn,mcn,xnc.xjfkl lcjdxc' react='21' />
+      <Post name='' img={p1} text='' react='4' />
+      <Post name='' img={avatar} text='' react='44' />
+      <Post name='' img={p2} text='' react='34' />
+      <Post name='' img={p3} text='' react='78' />
+      <Post name='' img={p4} text='' react='68' />
+      <Post name='' img={p5} text='' react='999' />
+      <Post name='' img={p6} text='' react='766' />
+      <Post name='' img={p7} text='' react='5555' />
+      <Post name='' img={p8} text='' react='457' />
+      <Post name='' img={p1} text='' react='455' />
+      <Post name='' img={p2} text='' react='665' />
+      <Post name='' img={p3} text='' react='554' />
+      <Post name='' img={p4} text='' react='677' />
+    </section>
   )
 }
 
