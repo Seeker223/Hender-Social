@@ -2,10 +2,10 @@
 import React from 'react'
 import Circle from '../components/Circle'
 
-const Right = ({ circles = [], onScrollUp }) => {
+const Right = ({ circles = [], onScrollDown }) => {
   const handleWheel = (event) => {
-    if (event.deltaY < 0 && onScrollUp) {
-      onScrollUp()
+    if (event.deltaY > 0 && onScrollDown) {
+      onScrollDown()
     }
   }
 
