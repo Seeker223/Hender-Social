@@ -18,8 +18,14 @@ const Top = ({ topCircles = [], badgeCount = 0 }) => {
         )}
       </Link>
       <div className='no-scrollbar flex flex-1 items-center gap-1 overflow-x-auto pr-1'>
-        {topCircles.map((circleId) => (
-          <Circle key={circleId} size='h-12 w-12' className='shrink-0' />
+        {topCircles.map((friend) => (
+          <Circle
+            key={friend.id}
+            size='h-12 w-12'
+            className='shrink-0'
+            src={friend.avatar}
+            name={friend.name}
+          />
         ))}
       </div>
     </header>

@@ -70,8 +70,8 @@ const Right = ({ circles = [], onScrollDown, onScrollUp }) => {
       onTouchEnd={handleTouchEnd}
     >
       <div className='flex flex-col items-center gap-2'>
-        {circles.map((circleId) => (
-          <Circle key={circleId} size='h-11 w-11' />
+        {circles.map((friend) => (
+          <Circle key={friend.id} size='h-11 w-11' src={friend.avatar} name={friend.name} />
         ))}
       </div>
     </aside>

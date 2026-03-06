@@ -1,14 +1,14 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import Top from '../components/Top'
 import Bottom from '../components/Bottom'
+import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
 
 const Home = () => {
-  const [topCircles, setTopCircles] = useState(
-    Array.from({ length: 6 }, (_, index) => `top-${index + 1}`)
-  )
-  const [rightCircles, setRightCircles] = useState(
-    Array.from({ length: 12 }, (_, index) => `right-${index + 1}`)
-  )
+  const currentUser = useMemo(() => getCurrentMockUser(), [])
+  const userFriends = useMemo(() => getFriendsForUser(currentUser), [currentUser])
+
+  const [topCircles, setTopCircles] = useState(() => userFriends.slice(0, 6))
+  const [rightCircles, setRightCircles] = useState(() => userFriends.slice(6))
   const [badgeCircles, setBadgeCircles] = useState([])
 
   const handleRightScrollDown = useCallback(() => {
