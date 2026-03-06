@@ -63,7 +63,7 @@ const Right = ({ circles = [], onScrollDown, onScrollUp }) => {
 
   return (
     <aside
-      className='h-full w-[58px] overflow-y-auto border-l border-[#ff2c7b] bg-[#efefef] py-1'
+      className='no-scrollbar h-full w-[58px] overflow-y-auto bg-[#efefef] py-1'
       onWheel={handleWheel}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
