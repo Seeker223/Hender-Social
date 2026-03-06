@@ -4,14 +4,14 @@ import Left from './Left'
 import AIcontainer from './AIcontainer'
 
 
-const Bottom = ({ rightCircles = [], onRightScrollDown }) => {
+const Bottom = ({ rightCircles = [], onRightScrollDown, onRightScrollUp }) => {
   return (
     <section className='relative h-[calc(100%-4rem)] w-full'>
      
       <div className='relative flex h-[calc(100%-3rem)] w-full'>
        
         <Left />
-        <Right circles={rightCircles} onScrollDown={onRightScrollDown} />
+        <Right circles={rightCircles} onScrollDown={onRightScrollDown} onScrollUp={onRightScrollUp} />
       </div>
       <AIcontainer />
     </section>
