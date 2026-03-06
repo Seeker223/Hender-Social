@@ -13,6 +13,10 @@ const Home = () => {
 
   const handleRightScrollDown = useCallback(() => {
     setRightCircles((currentRight) => {
+      if (currentRight.length <= 10) {
+        return currentRight
+      }
+
       if (currentRight.length === 0) {
         return currentRight
       }
