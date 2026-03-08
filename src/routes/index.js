@@ -1,130 +1,118 @@
-import { createBrowserRouter } from "react-router-dom";
-import App from "../App";
-import Circle from "../components/Circle";
-import LeftRoutes from "../components/LeftRoutes";
-import Photo from "../components/Photo";
-import Video from "../components/Video";
-import Call from "../components/Call";
-import Likes from "../components/Likes";
-import Search from "../components/Search";
-import ProtectedRoute from "../components/ProtectedRoute";
-const { default: Forget } = require("../pages/Forget");
-const { default: Home } = require("../pages/Home");
-const { default: Login } = require("../pages/Login");
-const { default: Logout } = require("../pages/Logout");
-const { default: Message } = require("../pages/Message");
-const { default: Register } = require("../pages/Register");
-const { default: SplashScreen } = require("../pages/SplashScreen");
-const { default: Artificialintelligence } = require("../pages/Artificialintelligence");
+import React, { Suspense, lazy } from "react"
+import { createBrowserRouter } from "react-router-dom"
+import ProtectedRoute from "../components/ProtectedRoute"
+import RouteSkeleton from "../components/RouteSkeleton"
+
+const App = lazy(() => import("../App"))
+const Circle = lazy(() => import("../components/Circle"))
+const LeftRoutes = lazy(() => import("../components/LeftRoutes"))
+const Photo = lazy(() => import("../components/Photo"))
+const Video = lazy(() => import("../components/Video"))
+const Call = lazy(() => import("../components/Call"))
+const Likes = lazy(() => import("../components/Likes"))
+const Search = lazy(() => import("../components/Search"))
+const Forget = lazy(() => import("../pages/Forget"))
+const Home = lazy(() => import("../pages/Home"))
+const Login = lazy(() => import("../pages/Login"))
+const Logout = lazy(() => import("../pages/Logout"))
+const Message = lazy(() => import("../pages/Message"))
+const Register = lazy(() => import("../pages/Register"))
+const SplashScreen = lazy(() => import("../pages/SplashScreen"))
+const Artificialintelligence = lazy(() => import("../pages/Artificialintelligence"))
+
+const withSuspense = (element) => <Suspense fallback={<RouteSkeleton />}>{element}</Suspense>
+
+const withPrivate = (element) => (
+  <ProtectedRoute>
+    {element}
+  </ProtectedRoute>
+)
 
 const router = createBrowserRouter([
-    {
-        path : "/",
-        element : <App/>,
-        children : [
-            {
-                path : "",
-                element : <SplashScreen/>
-            },
-            {
-                path : "home",
-                element : (
-                    <ProtectedRoute>
-                        <Home/>
-                    </ProtectedRoute>
-                ),
-                children : [
-                    {
-                        path : ':userId',
-                        element : <Message/>
-                    },
-                    {
-                        path : 'left',
-                        element : <LeftRoutes/>
-                    },
-                    {
-                        path : 'photo',
-                        element : <Photo/>
-                    },
-                    {
-                        path : 'video',
-                        element : <Video/>
-                    },
-                    {
-                        path : 'call',
-                        element : <Call/>
-                    },
-                    {
-                        path : 'likes',
-                        element : <Likes/>
-                    },
-                    {
-                        path : 'search',
-                        element : <Search/>
-                    },
-                    
-                ]
-            },
-            {
-                path : "circle",
-                element : (
-                    <ProtectedRoute>
-                        <Circle/>
-                    </ProtectedRoute>
-                )
-            },
-            {
-                path : "register",
-                element : <Register/>
-            },
-            {
-                path : 'login',
-                element : <Login/>
-            },
-            {
-                path : 'logout',
-                element : (
-                    <ProtectedRoute>
-                        <Logout/>
-                    </ProtectedRoute>
-                )
-            },
-            {
-                path : 'forgot-password',
-                element : <Forget/>
-            },
-            {
-                path : "chat",
-                element : (
-                    <ProtectedRoute>
-                        <Home/>
-                    </ProtectedRoute>
-                ),
-                children : [
-                    {
-                        path : ':userId',
-                        element : <Message/>
-                    }
-                ]
-            },
-        
-            {
-                path : "AiCategory",
-                element : (
-                    <ProtectedRoute>
-                        <Artificialintelligence/>
-                    </ProtectedRoute>
-                ),
-                children : [
-                    {
-                        path : ':userId',
-                        element : <Message/>
-                    }
-                ]
-            }
-        ]
-    }
-]
-)
+  {
+    path: "/",
+    element: withSuspense(<App />),
+    children: [
+      {
+        path: "",
+        element: withSuspense(<SplashScreen />),
+      },
+      {
+        path: "home",
+        element: withSuspense(withPrivate(<Home />)),
+        children: [
+          {
+            path: ":userId",
+            element: withSuspense(<Message />),
+          },
+          {
+            path: "left",
+            element: withSuspense(<LeftRoutes />),
+          },
+          {
+            path: "photo",
+            element: withSuspense(<Photo />),
+          },
+          {
+            path: "video",
+            element: withSuspense(<Video />),
+          },
+          {
+            path: "call",
+            element: withSuspense(<Call />),
+          },
+          {
+            path: "likes",
+            element: withSuspense(<Likes />),
+          },
+          {
+            path: "search",
+            element: withSuspense(<Search />),
+          },
+        ],
+      },
+      {
+        path: "circle",
+        element: withSuspense(withPrivate(<Circle />)),
+      },
+      {
+        path: "register",
+        element: withSuspense(<Register />),
+      },
+      {
+        path: "login",
+        element: withSuspense(<Login />),
+      },
+      {
+        path: "logout",
+        element: withSuspense(withPrivate(<Logout />)),
+      },
+      {
+        path: "forgot-password",
+        element: withSuspense(<Forget />),
+      },
+      {
+        path: "chat",
+        element: withSuspense(withPrivate(<Home />)),
+        children: [
+          {
+            path: ":userId",
+            element: withSuspense(<Message />),
+          },
+        ],
+      },
+      {
+        path: "AiCategory",
+        element: withSuspense(withPrivate(<Artificialintelligence />)),
+        children: [
+          {
+            path: ":userId",
+            element: withSuspense(<Message />),
+          },
+        ],
+      },
+    ],
+  },
+])
 
 export default router

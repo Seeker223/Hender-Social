@@ -10,8 +10,39 @@ import p6 from '../assets/male/p6.jpg'
 import p7 from '../assets/male/p7.jpg'
 import p8 from '../assets/male/p8.jpg'
 import avatar from '../assets/avatar.png'
+import { useEffect, useState } from 'react'
 
-const LeftRoutes = () => {
+const LeftRoutes = ({ isLoading = false }) => {
+  const [isPostLoading, setIsPostLoading] = useState(true)
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setIsPostLoading(false)
+    }, 1000)
+
+    return () => clearTimeout(timeoutId)
+  }, [])
+
+  const showSkeleton = isLoading || isPostLoading
+
+  if (showSkeleton) {
+    return (
+      <section className='h-full w-full overflow-y-auto bg-[#ececec] p-1'>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <article
+            key={`post-skeleton-${index + 1}`}
+            className='mb-2 animate-pulse rounded border border-[#e6e6e6] bg-white p-2'
+          >
+            <div className='mb-2 h-8 w-2/3 rounded bg-[#f1f1f1]' />
+            <div className='mb-2 h-4 w-full rounded bg-[#f1f1f1]' />
+            <div className='mb-2 h-4 w-5/6 rounded bg-[#f1f1f1]' />
+            <div className='h-40 w-full rounded bg-[#f1f1f1]' />
+          </article>
+        ))}
+      </section>
+    )
+  }
+
   return (
     <section className='h-full w-full overflow-y-auto bg-[#ececec]'>
       <Post name='ztsambad' img={hlogo2} text='efjfhjkfvdzjhnmcckn,mcn,xnc.xjfkl lcjdxc' react='21' />

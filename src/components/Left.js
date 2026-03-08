@@ -15,13 +15,13 @@ import { useOutlet } from "react-router-dom"
 import LeftRoutes from "../components/LeftRoutes"
 import IconContainer from "./IconContainer"
 
-const Left = () => {
+const Left = ({ isLoading = false }) => {
   const outlet = useOutlet()
 
   return (
     <div className='h-full w-[calc(100%-58px)] overflow-y-auto bg-[#efefef]'>
       <IconContainer />
-      {outlet || <LeftRoutes />}
+      {outlet || <LeftRoutes isLoading={isLoading} />}
     </div>
   )
 }

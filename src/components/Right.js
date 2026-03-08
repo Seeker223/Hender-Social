@@ -2,7 +2,7 @@
 import React, { useRef } from 'react'
 import Circle from '../components/Circle'
 
-const Right = ({ circles = [], onScrollDown, onScrollUp }) => {
+const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) => {
   const touchStartYRef = useRef(null)
   const touchCurrentYRef = useRef(null)
   const lastTriggerTimeRef = useRef(0)
@@ -85,9 +85,16 @@ const Right = ({ circles = [], onScrollDown, onScrollUp }) => {
       onTouchEnd={handleTouchEnd}
     >
       <div className='flex flex-col items-center gap-2'>
-        {circles.map((friend) => (
-          <Circle key={friend.id} size='h-11 w-11' src={friend.avatar} name={friend.name} />
-        ))}
+        {isLoading
+          ? Array.from({ length: 10 }).map((_, index) => (
+              <div
+                key={`right-skeleton-${index + 1}`}
+                className='h-11 w-11 animate-pulse rounded-full border-2 border-[#ffd2e5] bg-[#f1f1f1]'
+              />
+            ))
+          : circles.map((friend) => (
+              <Circle key={friend.id} size='h-11 w-11' src={friend.avatar} name={friend.name} />
+            ))}
       </div>
     </aside>
   )

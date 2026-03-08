@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import Top from '../components/Top'
 import Bottom from '../components/Bottom'
 import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
@@ -10,8 +10,21 @@ const Home = () => {
   const [topCircles, setTopCircles] = useState(() => userFriends.slice(0, 6))
   const [rightCircles, setRightCircles] = useState(() => userFriends.slice(6))
   const [badgeCircles, setBadgeCircles] = useState([])
+  const [isFriendsLoading, setIsFriendsLoading] = useState(true)
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setIsFriendsLoading(false)
+    }, 900)
+
+    return () => clearTimeout(timeoutId)
+  }, [])
 
   const handleRightScrollDown = useCallback(() => {
+    if (isFriendsLoading) {
+      return
+    }
+
     setRightCircles((currentRight) => {
       if (currentRight.length <= 10) {
         return currentRight
@@ -35,9 +48,13 @@ const Home = () => {
 
       return remainingRight
     })
-  }, [])
+  }, [isFriendsLoading])
 
   const handleRightScrollUp = useCallback(() => {
+    if (isFriendsLoading) {
+      return
+    }
+
     setBadgeCircles((currentBadge) => {
       if (currentBadge.length === 0) {
         return currentBadge
@@ -58,16 +75,21 @@ const Home = () => {
 
       return currentBadge.slice(0, -1)
     })
-  }, [])
+  }, [isFriendsLoading])
 
   return (
     <section className='min-h-screen w-full bg-[#e9e9e9] py-2 sm:py-4'>
       <div className='mx-auto h-[100dvh] max-h-[760px] w-full max-w-[390px] overflow-hidden border border-[#e4006e] bg-[#f4f4f4] shadow-lg'>
-        <Top topCircles={topCircles} badgeCount={badgeCircles.length} />
+        <Top
+          topCircles={topCircles}
+          badgeCount={badgeCircles.length}
+          isLoading={isFriendsLoading}
+        />
         <Bottom
           rightCircles={rightCircles}
           onRightScrollDown={handleRightScrollDown}
           onRightScrollUp={handleRightScrollUp}
+          isLoading={isFriendsLoading}
         />
       </div>
     </section>
