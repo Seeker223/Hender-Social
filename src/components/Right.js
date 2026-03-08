@@ -4,25 +4,48 @@ import Circle from '../components/Circle'
 
 const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) => {
   const touchStartYRef = useRef(null)
-  const touchCurrentYRef = useRef(null)
-  const lastTriggerTimeRef = useRef(0)
+  const lastTouchYRef = useRef(null)
+  const accumulatedDeltaRef = useRef(0)
 
-  const TRIGGER_COOLDOWN_MS = 220
-  const TOUCH_DELTA_THRESHOLD = 24
+  const STEP_PX = 52
 
-  const triggerByDirection = (direction) => {
-    const now = Date.now()
-    if (now - lastTriggerTimeRef.current < TRIGGER_COOLDOWN_MS) {
+  const cycleByDirection = (direction, count = 1) => {
+    if (count <= 0) {
       return
     }
 
-    lastTriggerTimeRef.current = now
-    if (direction === 'down' && onScrollDown) {
-      onScrollDown()
+    for (let i = 0; i < count; i += 1) {
+      if (direction === 'down' && onScrollDown) {
+        onScrollDown()
+      }
+      if (direction === 'up' && onScrollUp) {
+        onScrollUp()
+      }
     }
-    if (direction === 'up' && onScrollUp) {
-      onScrollUp()
+  }
+
+  const processDelta = (deltaY) => {
+    if (deltaY === 0) {
+      return
     }
+
+    accumulatedDeltaRef.current += deltaY
+    const cycles = Math.floor(Math.abs(accumulatedDeltaRef.current) / STEP_PX)
+
+    if (cycles <= 0) {
+      return
+    }
+
+    if (accumulatedDeltaRef.current > 0) {
+      cycleByDirection('down', cycles)
+    } else {
+      cycleByDirection('up', cycles)
+    }
+
+    accumulatedDeltaRef.current =
+      accumulatedDeltaRef.current > 0
+        ? accumulatedDeltaRef.current - cycles * STEP_PX
+        : accumulatedDeltaRef.current + cycles * STEP_PX
   }
 
   const handleWheel = (event) => {
@@ -33,47 +56,35 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) =>
       return
     }
 
-    if (event.deltaY > 0 && onScrollDown) {
-      triggerByDirection('down')
-    }
-    if (event.deltaY < 0 && onScrollUp) {
-      triggerByDirection('up')
-    }
+    processDelta(event.deltaY)
   }
 
   const handleTouchStart = (event) => {
     const startY = event.touches[0]?.clientY ?? null
     touchStartYRef.current = startY
-    touchCurrentYRef.current = startY
+    lastTouchYRef.current = startY
+    accumulatedDeltaRef.current = 0
   }
 
   const handleTouchMove = (event) => {
-    const currentY = event.touches[0]?.clientY
-    if (touchStartYRef.current === null || typeof currentY !== 'number') {
+    const currentY = event.touches[0]?.clientY ?? null
+    if (
+      touchStartYRef.current === null ||
+      lastTouchYRef.current === null ||
+      typeof currentY !== 'number'
+    ) {
       return
     }
 
-    touchCurrentYRef.current = currentY
+    const deltaY = lastTouchYRef.current - currentY
+    processDelta(deltaY)
+    lastTouchYRef.current = currentY
   }
 
   const handleTouchEnd = () => {
-    if (touchStartYRef.current === null || touchCurrentYRef.current === null) {
-      touchStartYRef.current = null
-      touchCurrentYRef.current = null
-      return
-    }
-
-    const deltaY = touchStartYRef.current - touchCurrentYRef.current
-    if (Math.abs(deltaY) >= TOUCH_DELTA_THRESHOLD) {
-      if (deltaY > 0) {
-        triggerByDirection('down')
-      } else {
-        triggerByDirection('up')
-      }
-    }
-
     touchStartYRef.current = null
-    touchCurrentYRef.current = null
+    lastTouchYRef.current = null
+    accumulatedDeltaRef.current = 0
   }
 
   return (
