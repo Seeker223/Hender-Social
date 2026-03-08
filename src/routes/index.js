@@ -7,6 +7,7 @@ import Video from "../components/Video";
 import Call from "../components/Call";
 import Likes from "../components/Likes";
 import Search from "../components/Search";
+import ProtectedRoute from "../components/ProtectedRoute";
 const { default: Forget } = require("../pages/Forget");
 const { default: Home } = require("../pages/Home");
 const { default: Login } = require("../pages/Login");
@@ -27,7 +28,11 @@ const router = createBrowserRouter([
             },
             {
                 path : "home",
-                element : <Home/>,
+                element : (
+                    <ProtectedRoute>
+                        <Home/>
+                    </ProtectedRoute>
+                ),
                 children : [
                     {
                         path : ':userId',
@@ -62,7 +67,11 @@ const router = createBrowserRouter([
             },
             {
                 path : "circle",
-                element : <Circle/>
+                element : (
+                    <ProtectedRoute>
+                        <Circle/>
+                    </ProtectedRoute>
+                )
             },
             {
                 path : "register",
@@ -74,7 +83,11 @@ const router = createBrowserRouter([
             },
             {
                 path : 'logout',
-                element : <Logout/>
+                element : (
+                    <ProtectedRoute>
+                        <Logout/>
+                    </ProtectedRoute>
+                )
             },
             {
                 path : 'forgot-password',
@@ -82,7 +95,11 @@ const router = createBrowserRouter([
             },
             {
                 path : "chat",
-                element : <Home/>,
+                element : (
+                    <ProtectedRoute>
+                        <Home/>
+                    </ProtectedRoute>
+                ),
                 children : [
                     {
                         path : ':userId',
@@ -93,7 +110,11 @@ const router = createBrowserRouter([
         
             {
                 path : "AiCategory",
-                element : <Artificialintelligence/>,
+                element : (
+                    <ProtectedRoute>
+                        <Artificialintelligence/>
+                    </ProtectedRoute>
+                ),
                 children : [
                     {
                         path : ':userId',

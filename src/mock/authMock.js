@@ -98,20 +98,29 @@ export const setCurrentMockUser = (user) => {
 
 export const getCurrentMockUser = () => {
   if (!canUseStorage()) {
-    return DEFAULT_USERS[0]
+    return null
   }
 
   const session = window.localStorage.getItem(MOCK_SESSION_KEY)
   if (!session) {
-    return getMockUsers()[0]
+    return null
   }
 
   try {
     return JSON.parse(session)
   } catch {
-    return getMockUsers()[0]
+    return null
   }
 }
+
+export const clearCurrentMockUser = () => {
+  if (!canUseStorage()) {
+    return
+  }
+  window.localStorage.removeItem(MOCK_SESSION_KEY)
+}
+
+export const isMockAuthenticated = () => !!getCurrentMockUser()
 
 export const loginMockUser = ({ email, password }) => {
   const users = getMockUsers()
