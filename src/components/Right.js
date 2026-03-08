@@ -4,10 +4,11 @@ import Circle from '../components/Circle'
 
 const Right = ({ circles = [], onScrollDown, onScrollUp }) => {
   const touchStartYRef = useRef(null)
+  const touchCurrentYRef = useRef(null)
   const lastTriggerTimeRef = useRef(0)
 
-  const TRIGGER_COOLDOWN_MS = 160
-  const TOUCH_DELTA_THRESHOLD = 18
+  const TRIGGER_COOLDOWN_MS = 220
+  const TOUCH_DELTA_THRESHOLD = 24
 
   const triggerByDirection = (direction) => {
     const now = Date.now()
@@ -25,6 +26,13 @@ const Right = ({ circles = [], onScrollDown, onScrollUp }) => {
   }
 
   const handleWheel = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    if (Math.abs(event.deltaY) < 3) {
+      return
+    }
+
     if (event.deltaY > 0 && onScrollDown) {
       triggerByDirection('down')
     }
@@ -34,7 +42,9 @@ const Right = ({ circles = [], onScrollDown, onScrollUp }) => {
   }
 
   const handleTouchStart = (event) => {
-    touchStartYRef.current = event.touches[0]?.clientY ?? null
+    const startY = event.touches[0]?.clientY ?? null
+    touchStartYRef.current = startY
+    touchCurrentYRef.current = startY
   }
 
   const handleTouchMove = (event) => {
@@ -43,27 +53,32 @@ const Right = ({ circles = [], onScrollDown, onScrollUp }) => {
       return
     }
 
-    const deltaY = touchStartYRef.current - currentY
-    if (Math.abs(deltaY) < TOUCH_DELTA_THRESHOLD) {
-      return
-    }
-
-    if (deltaY > 0) {
-      triggerByDirection('down')
-    } else {
-      triggerByDirection('up')
-    }
-
-    touchStartYRef.current = currentY
+    touchCurrentYRef.current = currentY
   }
 
   const handleTouchEnd = () => {
+    if (touchStartYRef.current === null || touchCurrentYRef.current === null) {
+      touchStartYRef.current = null
+      touchCurrentYRef.current = null
+      return
+    }
+
+    const deltaY = touchStartYRef.current - touchCurrentYRef.current
+    if (Math.abs(deltaY) >= TOUCH_DELTA_THRESHOLD) {
+      if (deltaY > 0) {
+        triggerByDirection('down')
+      } else {
+        triggerByDirection('up')
+      }
+    }
+
     touchStartYRef.current = null
+    touchCurrentYRef.current = null
   }
 
   return (
     <aside
-      className='no-scrollbar h-full w-[58px] overflow-y-auto bg-[#efefef] py-1'
+      className='no-scrollbar h-full w-[58px] touch-none overflow-hidden bg-[#efefef] py-1 select-none'
       onWheel={handleWheel}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
