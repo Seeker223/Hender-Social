@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom'
 
 
 const Top = ({ topCircles = [], badgeCount = 0, isLoading = false }) => {
+  const visibleCircles = topCircles.slice(0, 6)
   return (
     <header className='flex h-16 w-full items-center gap-2 bg-[#efefef] px-1'>
       <Link to='/home/left' className='relative h-12 w-12 shrink-0'>
@@ -25,7 +26,7 @@ const Top = ({ topCircles = [], badgeCount = 0, isLoading = false }) => {
                 className='h-12 w-12 shrink-0 animate-pulse rounded-full border-2 border-[#ffd2e5] bg-[#f1f1f1]'
               />
             ))
-          : topCircles.map((friend) => (
+          : visibleCircles.map((friend) => (
               <Circle
                 key={friend.id}
                 size='h-12 w-12'
