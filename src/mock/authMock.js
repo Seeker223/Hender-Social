@@ -1,45 +1,34 @@
-import p1 from '../assets/male/p1.jpg'
-import p2 from '../assets/male/p2.jpg'
-import p3 from '../assets/male/p3.jpg'
-import p4 from '../assets/male/p4.jpg'
-import p5 from '../assets/male/p5.jpg'
-import p6 from '../assets/male/p6.jpg'
-import p7 from '../assets/male/p7.jpg'
-import p8 from '../assets/male/p8.jpg'
-import f1 from '../assets/female/1.jpg'
-import f2 from '../assets/female/2.jpg'
-import f3 from '../assets/female/3.jpg'
-import f4 from '../assets/female/4.jpg'
-import f5 from '../assets/female/5.jpg'
-import f6 from '../assets/female/6.jpg'
-import f7 from '../assets/female/7.jpg'
-import f8 from '../assets/female/8.jpg'
-import f9 from '../assets/female/9.jpg'
-import f10 from '../assets/female/10.jpg'
+import avatar from '../assets/avatar.png'
 
 const MOCK_USERS_KEY = 'hender_mock_users'
 const MOCK_SESSION_KEY = 'hender_mock_session'
 
-export const MOCK_FRIENDS = [
-  { id: 'f1', name: 'Alex', avatar: p1 },
-  { id: 'f2', name: 'Maya', avatar: f1 },
-  { id: 'f3', name: 'Chris', avatar: p2 },
-  { id: 'f4', name: 'Ada', avatar: f2 },
-  { id: 'f5', name: 'Noah', avatar: p3 },
-  { id: 'f6', name: 'Ella', avatar: f3 },
-  { id: 'f7', name: 'Zane', avatar: p4 },
-  { id: 'f8', name: 'Liam', avatar: p5 },
-  { id: 'f9', name: 'Tola', avatar: f4 },
-  { id: 'f10', name: 'Ruby', avatar: f5 },
-  { id: 'f11', name: 'Dara', avatar: f6 },
-  { id: 'f12', name: 'Kemi', avatar: f7 },
-  { id: 'f13', name: 'Joy', avatar: f8 },
-  { id: 'f14', name: 'Bree', avatar: f9 },
-  { id: 'f15', name: 'Iris', avatar: f10 },
-  { id: 'f16', name: 'Theo', avatar: p6 },
-  { id: 'f17', name: 'Milo', avatar: p7 },
-  { id: 'f18', name: 'Evan', avatar: p8 },
+const FRIEND_NAMES = [
+  'Alex',
+  'Maya',
+  'Chris',
+  'Ada',
+  'Noah',
+  'Ella',
+  'Zane',
+  'Liam',
+  'Tola',
+  'Ruby',
+  'Dara',
+  'Kemi',
+  'Joy',
+  'Bree',
+  'Iris',
+  'Theo',
+  'Milo',
+  'Evan',
 ]
+
+export const MOCK_FRIENDS = Array.from({ length: 48 }, (_, index) => {
+  const id = `f${index + 1}`
+  const name = FRIEND_NAMES[index] || `Friend ${index + 1}`
+  return { id, name, avatar }
+})
 
 const DEFAULT_USERS = [
   {

@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/637.50de09c7.chunk.js","mappings":"qJAEA,MAMA,EANcA,KAEVC,EAAAA,EAAAA,KAAA,OAAAC,SAAK,S","sources":["components/Likes.js"],"sourcesContent":["import React from 'react'\r\n\r\nconst Likes = () => {\r\n  return (\r\n    <div>Likes</div>\r\n  )\r\n}\r\n\r\nexport default Likes"],"names":["Likes","_jsx","children"],"sourceRoot":""}

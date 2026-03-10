@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkclientend=self.webpackChunkclientend||[]).push([[428],{428:(e,i,n)=>{n.r(i),n.d(i,{default:()=>l});n(43);var c=n(579);const l=()=>(0,c.jsx)("div",{children:"Artificialintelligence"})}}]);
+//# sourceMappingURL=428.d51a6f5c.chunk.js.map

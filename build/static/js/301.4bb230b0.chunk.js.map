@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/301.4bb230b0.chunk.js","mappings":"qJAEA,MAMA,EANaA,KAETC,EAAAA,EAAAA,KAAA,OAAAC,SAAK,Q","sources":["components/Call.js"],"sourcesContent":["import React from 'react'\r\n\r\nconst Call = () => {\r\n  return (\r\n    <div>Call</div>\r\n  )\r\n}\r\n\r\nexport default Call"],"names":["Call","_jsx","children"],"sourceRoot":""}

@@ -6,7 +6,13 @@ const Post = (props) => {
     <article className='w-full border-b border-[#d4d4d4] bg-[#efefef] pb-2'>
       <div className='flex items-center gap-2 px-1 py-1'>
         <div className='h-10 w-10 rounded-full border border-[#c2c2c2]'>
-          <img src={props.img} className='h-full w-full rounded-full object-cover' alt='profile' />
+          <img
+            src={props.img}
+            className='h-full w-full rounded-full object-cover'
+            alt='profile'
+            loading="lazy"
+            decoding="async"
+          />
         </div>
         <p className='text-[27px] font-bold leading-none text-[#e30072]'>hh</p>
         <p className='text-base font-semibold text-black'>{props.name}</p>
@@ -17,7 +23,13 @@ const Post = (props) => {
       </div>
 
       <div className='mx-1 overflow-hidden border border-[#d3d3d3] bg-[#efefef]'>
-        <img src={props.img} className='h-[240px] w-full object-cover' alt='post' />
+        <img
+          src={props.img}
+          className='h-[240px] w-full object-cover'
+          alt='post'
+          loading="lazy"
+          decoding="async"
+        />
       </div>
 
       <p className='px-1 pt-1 text-lg font-bold leading-6 text-black'>you and {props.react} reacted</p>

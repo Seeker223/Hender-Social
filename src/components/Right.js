@@ -7,7 +7,8 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) =>
   const lastTouchYRef = useRef(null)
   const accumulatedDeltaRef = useRef(0)
 
-  const STEP_PX = 52
+  const STEP_PX = 36
+  const MAX_CYCLES_PER_EVENT = 6
 
   const cycleByDirection = (direction, count = 1) => {
     if (count <= 0) {
@@ -30,7 +31,8 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) =>
     }
 
     accumulatedDeltaRef.current += deltaY
-    const cycles = Math.floor(Math.abs(accumulatedDeltaRef.current) / STEP_PX)
+    const rawCycles = Math.floor(Math.abs(accumulatedDeltaRef.current) / STEP_PX)
+    const cycles = Math.min(rawCycles, MAX_CYCLES_PER_EVENT)
 
     if (cycles <= 0) {
       return

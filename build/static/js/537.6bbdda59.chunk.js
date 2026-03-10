@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkclientend=self.webpackChunkclientend||[]).push([[537],{8537:(e,a,t)=>{t.r(a),t.d(a,{default:()=>s});t(5043);var c=t(4211),r=t(579);const s=e=>{let{size:a="h-10 w-10",className:t="",src:s=c,name:n="avatar"}=e;return(0,r.jsx)("img",{src:s,className:"".concat(a," ").concat(t," cursor-pointer rounded-full border-2 border-[#ff2c7b] object-cover"),alt:n,title:n})}},4211:(e,a,t)=>{e.exports=t.p+"static/media/avatar.af0f05e840e1ba443061.png"}}]);
-//# sourceMappingURL=537.6bbdda59.chunk.js.map
