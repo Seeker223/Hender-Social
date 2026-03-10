@@ -55,12 +55,22 @@ const Post = (props) => {
     </Svg>
   )
 
+  // Instagram-like outline icons (rounded caps/joins, minimal strokes)
   const LikeIcon = ({ active }) => (
     <Svg>
       <path
-        d='M12 4 6 10h4v10h4V10h4L12 4Z'
+        d='M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3v11Z'
         stroke='currentColor'
         strokeWidth='2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        opacity={active ? '1' : '0.75'}
+      />
+      <path
+        d='M7 11l4.5-8.2a2 2 0 0 1 3.8.9V11h3.7a2 2 0 0 1 2 2.3l-1 6.7A3 3 0 0 1 20.1 22H7'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinecap='round'
         strokeLinejoin='round'
         opacity={active ? '1' : '0.75'}
       />
@@ -70,9 +80,18 @@ const Post = (props) => {
   const DislikeIcon = ({ active }) => (
     <Svg>
       <path
-        d='M12 20 6 14h4V4h4v10h4l-6 6Z'
+        d='M7 2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3V2Z'
         stroke='currentColor'
         strokeWidth='2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        opacity={active ? '1' : '0.75'}
+      />
+      <path
+        d='M7 13l4.5 8.2a2 2 0 0 0 3.8-.9V13h3.7a2 2 0 0 0 2-2.3l-1-6.7A3 3 0 0 0 20.1 2H7'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinecap='round'
         strokeLinejoin='round'
         opacity={active ? '1' : '0.75'}
       />
@@ -85,6 +104,7 @@ const Post = (props) => {
         d='M5 6h14v9H8l-3 3V6Z'
         stroke='currentColor'
         strokeWidth='2'
+        strokeLinecap='round'
         strokeLinejoin='round'
       />
     </Svg>
@@ -96,12 +116,14 @@ const Post = (props) => {
         d='M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7S2.5 12 2.5 12Z'
         stroke='currentColor'
         strokeWidth='2'
+        strokeLinecap='round'
         strokeLinejoin='round'
       />
       <path
         d='M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z'
         stroke='currentColor'
         strokeWidth='2'
+        strokeLinecap='round'
         strokeLinejoin='round'
       />
     </Svg>
