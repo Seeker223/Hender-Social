@@ -18,7 +18,7 @@ const Top = ({ topCircles = [], badgeCount = 0, isLoading = false }) => {
           </span>
         )}
       </Link>
-      <div className='no-scrollbar flex flex-1 items-center gap-1 overflow-x-auto pr-1'>
+      <div className='flex flex-1 items-center gap-1 overflow-hidden pr-1'>
         {isLoading
           ? Array.from({ length: 6 }).map((_, index) => (
               <div
