@@ -6,7 +6,7 @@ function App() {
   return (
    <> 
       <Toaster/>
-       <main className=" bg-maincolor" >
+       <main className="min-h-screen bg-[var(--hx-app-bg)] text-[var(--hx-text)]" >
         <Outlet/>
        </main>
      

@@ -82,6 +82,23 @@ const VideoIcon = () => (
   </Svg>
 )
 
+const SunIcon = () => (
+  <Svg>
+    <path
+      d='M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinejoin='round'
+    />
+    <path
+      d='M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+    />
+  </Svg>
+)
+
 const MoonIcon = () => (
   <Svg>
     <path
@@ -116,7 +133,9 @@ const Item = ({ to, label, children }) => (
     aria-label={label}
     className={({ isActive }) =>
       `flex items-center justify-center rounded-full p-2 transition-colors ${
-        isActive ? 'bg-[#ffe3f1] text-[#e4006e]' : 'text-black hover:bg-[#f4f4f4]'
+        isActive
+          ? 'bg-[var(--hx-accent-bg)] text-[var(--hx-accent)]'
+          : 'text-[var(--hx-text)] hover:bg-[var(--hx-surface-2)]'
       }`
     }
   >
@@ -140,7 +159,7 @@ const IconContainer = () => {
   }, [theme])
 
   return (
-    <nav className='flex h-12 items-center justify-between border-b border-[#b6b6b6] bg-white px-2 text-black'>
+    <nav className='flex h-12 items-center justify-between border-b border-[var(--hx-border)] bg-[var(--hx-surface)] px-2 text-[var(--hx-text)]'>
       <Item to='/home/left' label='Home'><HomeIcon /></Item>
       <Item to='/home/likes' label='Notifications'><BellIcon /></Item>
       <Item to='/home/messages' label='Messages'><MessageIcon /></Item>
@@ -148,16 +167,16 @@ const IconContainer = () => {
       <Item to='/home/profile' label='Profile'><UserIcon /></Item>
       <button
         type='button'
-        aria-label='Dark mode'
-        className='flex items-center justify-center rounded-full p-2 text-black transition-colors hover:bg-[#f4f4f4]'
+        aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+        className='flex items-center justify-center rounded-full p-2 text-[var(--hx-text)] transition-colors hover:bg-[var(--hx-surface-2)]'
         onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
       >
-        <MoonIcon />
+        {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
       </button>
       <button
         type='button'
         aria-label='Post'
-        className='flex items-center justify-center rounded-full p-2 text-black transition-colors hover:bg-[#f4f4f4]'
+        className='flex items-center justify-center rounded-full p-2 text-[var(--hx-text)] transition-colors hover:bg-[var(--hx-surface-2)]'
         onClick={() => navigate('/home/post')}
       >
         <PlusSquareIcon />

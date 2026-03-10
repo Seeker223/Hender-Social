@@ -31,10 +31,24 @@ code {
 
 :root {
   --hx-app-bg: #e2e8f0;
+  --hx-surface: #ffffff;
+  --hx-surface-2: #f2f2f2;
   --hx-text: #000;
+  --hx-text-muted: rgba(0, 0, 0, 0.65);
+  --hx-border: rgba(0, 0, 0, 0.12);
+  --hx-accent: #e4006e;
+  --hx-accent-bg: #ffe3f1;
+  color-scheme: light;
 }
 
 :root[data-theme="dark"] {
   --hx-app-bg: #0b0b0e;
+  --hx-surface: #121218;
+  --hx-surface-2: #1a1a24;
   --hx-text: #f3f3f3;
+  --hx-text-muted: rgba(243, 243, 243, 0.7);
+  --hx-border: rgba(243, 243, 243, 0.14);
+  --hx-accent: #ff4aa0;
+  --hx-accent-bg: rgba(255, 74, 160, 0.16);
+  color-scheme: dark;
 }

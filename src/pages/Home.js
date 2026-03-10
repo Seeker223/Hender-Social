@@ -81,8 +81,8 @@ const Home = () => {
   }, [isFriendsLoading])
 
   return (
-    <section className='min-h-screen w-full bg-[#e9e9e9] py-2 sm:py-4'>
-      <div className='mx-auto h-[100dvh] max-h-[760px] w-full max-w-[390px] overflow-hidden border border-[#e4006e] bg-[#f4f4f4] shadow-lg'>
+    <section className='min-h-screen w-full bg-[var(--hx-app-bg)] py-2 sm:py-4'>
+      <div className='mx-auto h-[100dvh] max-h-[760px] w-full max-w-[390px] overflow-hidden border border-[#e4006e] bg-[var(--hx-surface)] shadow-lg'>
         <Top
           topCircles={topCircles}
           badgeCount={badgeCircles.length}

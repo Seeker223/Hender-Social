@@ -19,7 +19,7 @@ const Left = ({ isLoading = false }) => {
   const outlet = useOutlet()
 
   return (
-    <div className='h-full w-[calc(100%-58px)] overflow-y-auto bg-[#efefef]'>
+    <div className='h-full w-[calc(100%-58px)] overflow-y-auto bg-[var(--hx-surface-2)]'>
       <IconContainer />
       {outlet || <LeftRoutes isLoading={isLoading} />}
     </div>

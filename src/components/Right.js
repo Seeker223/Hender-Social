@@ -106,7 +106,7 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
 
   return (
     <aside
-      className='no-scrollbar h-full w-[58px] touch-none overflow-hidden bg-[#efefef] py-1 select-none'
+      className='no-scrollbar h-full w-[58px] touch-none overflow-hidden bg-[var(--hx-surface-2)] py-1 select-none'
       onWheel={handleWheel}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
