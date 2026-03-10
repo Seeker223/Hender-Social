@@ -156,6 +156,12 @@ export const getFriendsForUser = (user) => {
     return MOCK_FRIENDS
   }
 
+  // Older sessions/users may have a shorter friendIds list; default to full mock list.
+  if (user.friendIds.length < 36) {
+    return MOCK_FRIENDS
+  }
+
   const friendSet = new Set(user.friendIds)
-  return MOCK_FRIENDS.filter((friend) => friendSet.has(friend.id))
+  const filtered = MOCK_FRIENDS.filter((friend) => friendSet.has(friend.id))
+  return filtered.length >= 36 ? filtered : MOCK_FRIENDS
 }

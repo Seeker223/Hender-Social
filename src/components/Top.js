@@ -33,6 +33,8 @@ const Top = ({ topCircles = [], badgeCount = 0, isLoading = false }) => {
                 className='shrink-0'
                 src={friend.avatar}
                 name={friend.name}
+                showBadge
+                badgeKey={friend.id}
               />
             ))}
       </div>

@@ -8,7 +8,7 @@ const Home = () => {
   const userFriends = useMemo(() => getFriendsForUser(currentUser), [currentUser])
 
   const [topCircles, setTopCircles] = useState(() => userFriends.slice(0, 6))
-  const [rightCircles, setRightCircles] = useState(() => userFriends.slice(6))
+  const [rightCircles, setRightCircles] = useState(() => userFriends.slice(6, 36))
   const [badgeCircles, setBadgeCircles] = useState([])
   const [isFriendsLoading, setIsFriendsLoading] = useState(true)
 

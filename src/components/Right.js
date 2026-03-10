@@ -3,8 +3,9 @@ import React, { useRef } from 'react'
 import Circle from '../components/Circle'
 
 const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) => {
-  const touchStartYRef = useRef(null)
-  const lastTouchYRef = useRef(null)
+  const railRef = useRef(null)
+  const lastScrollTopRef = useRef(0)
+  const isResettingRef = useRef(false)
   const accumulatedDeltaRef = useRef(0)
 
   const STEP_PX = 36
@@ -51,51 +52,44 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) =>
   }
 
   const handleWheel = (event) => {
-    event.preventDefault()
-    event.stopPropagation()
-
-    if (Math.abs(event.deltaY) < 3) {
-      return
-    }
-
+    // Keep desktop wheel working even if the rail is scrollable.
     processDelta(event.deltaY)
   }
 
-  const handleTouchStart = (event) => {
-    const startY = event.touches[0]?.clientY ?? null
-    touchStartYRef.current = startY
-    lastTouchYRef.current = startY
-    accumulatedDeltaRef.current = 0
-  }
-
-  const handleTouchMove = (event) => {
-    const currentY = event.touches[0]?.clientY ?? null
-    if (
-      touchStartYRef.current === null ||
-      lastTouchYRef.current === null ||
-      typeof currentY !== 'number'
-    ) {
+  const handleScroll = (event) => {
+    if (isResettingRef.current) {
       return
     }
 
-    const deltaY = lastTouchYRef.current - currentY
-    processDelta(deltaY)
-    lastTouchYRef.current = currentY
-  }
+    const currentTop = event.currentTarget.scrollTop
+    const delta = currentTop - lastScrollTopRef.current
+    lastScrollTopRef.current = currentTop
 
-  const handleTouchEnd = () => {
-    touchStartYRef.current = null
-    lastTouchYRef.current = null
-    accumulatedDeltaRef.current = 0
+    // Ignore tiny moves; reduces noise and keeps cycling snappy.
+    if (Math.abs(delta) < 2) {
+      return
+    }
+
+    processDelta(delta)
+
+    // Reset scroll position to avoid drift/jank while still allowing touch scroll gestures.
+    isResettingRef.current = true
+    requestAnimationFrame(() => {
+      if (railRef.current) {
+        railRef.current.scrollTop = 0
+      }
+      lastScrollTopRef.current = 0
+      accumulatedDeltaRef.current = 0
+      isResettingRef.current = false
+    })
   }
 
   return (
     <aside
-      className='no-scrollbar h-full w-[58px] touch-none overflow-hidden bg-[#efefef] py-1 select-none'
+      ref={railRef}
+      className='no-scrollbar h-full w-[58px] overflow-y-auto overscroll-contain bg-[#efefef] py-1 select-none'
       onWheel={handleWheel}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      onScroll={handleScroll}
     >
       <div className='flex flex-col items-center gap-2'>
         {isLoading
@@ -106,7 +100,14 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) =>
               />
             ))
           : circles.map((friend) => (
-              <Circle key={friend.id} size='h-11 w-11' src={friend.avatar} name={friend.name} />
+              <Circle
+                key={friend.id}
+                size='h-11 w-11'
+                src={friend.avatar}
+                name={friend.name}
+                showBadge
+                badgeKey={friend.id}
+              />
             ))}
       </div>
     </aside>
