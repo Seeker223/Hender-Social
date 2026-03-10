@@ -14,8 +14,8 @@ const Post = (props) => {
       type='button'
       aria-label={label}
       onClick={onClick}
-      className={`flex items-center gap-1 rounded p-1 text-black transition-colors ${
-        active ? 'text-[#e4006e]' : 'text-black'
+      className={`flex items-center gap-1 rounded p-1 transition-colors ${
+        active ? 'text-[var(--hx-accent)]' : 'text-[var(--hx-text)]'
       }`}
     >
       {children}
@@ -130,9 +130,9 @@ const Post = (props) => {
   )
 
   return (
-    <article className='w-full border-b border-[#d4d4d4] bg-[#efefef] pb-2'>
+    <article className='w-full border-b border-[var(--hx-border)] bg-[var(--hx-surface)] pb-2'>
       <div className='flex items-center gap-2 px-1 py-1'>
-        <div className='h-10 w-10 rounded-full border border-[#c2c2c2]'>
+        <div className='h-10 w-10 rounded-full border border-[var(--hx-border)]'>
           <img
             src={props.img}
             className='h-full w-full rounded-full object-cover'
@@ -141,15 +141,15 @@ const Post = (props) => {
             decoding="async"
           />
         </div>
-        <p className='text-[27px] font-bold leading-none text-[#e30072]'>hh</p>
-        <p className='text-base font-semibold text-black'>{props.name}</p>
+        <p className='text-[27px] font-bold leading-none text-[var(--hx-accent)]'>hh</p>
+        <p className='text-base font-semibold text-[var(--hx-text)]'>{props.name}</p>
       </div>
 
-      <div className='mx-1 mb-1 rounded border border-black bg-white px-1 text-sm leading-5 text-black'>
+      <div className='mx-1 mb-1 rounded border border-[var(--hx-border)] bg-[var(--hx-surface)] px-1 text-sm leading-5 text-[var(--hx-text)]'>
         {props.text}
       </div>
 
-      <div className='mx-1 overflow-hidden border border-[#d3d3d3] bg-[#efefef]'>
+      <div className='mx-1 overflow-hidden border border-[var(--hx-border)] bg-[var(--hx-surface-2)]'>
         <img
           src={props.img}
           className='h-[240px] w-full object-cover'
@@ -159,9 +159,11 @@ const Post = (props) => {
         />
       </div>
 
-      <p className='px-1 pt-1 text-lg font-bold leading-6 text-black'>you and {props.react} reacted</p>
+      <p className='px-1 pt-1 text-lg font-bold leading-6 text-[var(--hx-text)]'>
+        you and {props.react} reacted
+      </p>
 
-      <div className='mx-1 mt-2 flex items-center justify-between text-black'>
+      <div className='mx-1 mt-2 flex items-center justify-between text-[var(--hx-text)]'>
         <IconButton
           active={reXended}
           label='Re-xend'
@@ -179,7 +181,7 @@ const Post = (props) => {
           }}
         >
           <LikeIcon active={liked} />
-          <span className='text-xs font-semibold text-black/70'>{likeCount}</span>
+          <span className='text-xs font-semibold text-[var(--hx-text-muted)]'>{likeCount}</span>
         </IconButton>
 
         <IconButton
@@ -195,16 +197,16 @@ const Post = (props) => {
 
         <IconButton active={false} label='Comments' onClick={() => {}}>
           <CommentIcon />
-          <span className='text-xs font-semibold text-black/70'>{commentCount}</span>
+          <span className='text-xs font-semibold text-[var(--hx-text-muted)]'>{commentCount}</span>
         </IconButton>
 
-        <div className='flex items-center gap-1 p-1 text-black'>
+        <div className='flex items-center gap-1 p-1 text-[var(--hx-text)]'>
           <EyeIcon />
-          <span className='text-xs font-semibold text-black/70'>{viewCount}</span>
+          <span className='text-xs font-semibold text-[var(--hx-text-muted)]'>{viewCount}</span>
         </div>
       </div>
 
-      <p className='px-1 text-lg leading-6 text-black'>Post-most-comment</p>
+      <p className='px-1 text-lg leading-6 text-[var(--hx-text)]'>Post-most-comment</p>
     </article>
   )
 }

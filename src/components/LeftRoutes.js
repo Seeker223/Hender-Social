@@ -27,11 +27,11 @@ const LeftRoutes = ({ isLoading = false }) => {
 
   if (showSkeleton) {
     return (
-      <section className='h-full w-full overflow-y-auto bg-[#ececec] p-1'>
+      <section className='h-full w-full overflow-y-auto bg-[var(--hx-app-bg)] p-1'>
         {Array.from({ length: 4 }).map((_, index) => (
           <article
             key={`post-skeleton-${index + 1}`}
-            className='mb-2 animate-pulse rounded border border-[#e6e6e6] bg-white p-2'
+            className='mb-2 animate-pulse rounded border border-[var(--hx-border)] bg-[var(--hx-surface)] p-2'
           >
             <div className='mb-2 h-8 w-2/3 rounded bg-[#f1f1f1]' />
             <div className='mb-2 h-4 w-full rounded bg-[#f1f1f1]' />
@@ -44,7 +44,7 @@ const LeftRoutes = ({ isLoading = false }) => {
   }
 
   return (
-    <section className='h-full w-full overflow-y-auto bg-[#ececec]'>
+    <section className='h-full w-full overflow-y-auto bg-[var(--hx-app-bg)]'>
       <Post name='ztsambad' img={hlogo2} text='efjfhjkfvdzjhnmcckn,mcn,xnc.xjfkl lcjdxc' react='21' />
       <Post name='' img={p1} text='' react='4' />
       <Post name='' img={avatar} text='' react='44' />
