@@ -16,6 +16,8 @@ const Home = lazy(() => import("../pages/Home"))
 const Login = lazy(() => import("../pages/Login"))
 const Logout = lazy(() => import("../pages/Logout"))
 const Message = lazy(() => import("../pages/Message"))
+const Profile = lazy(() => import("../pages/Profile"))
+const CreatePost = lazy(() => import("../pages/CreatePost"))
 const Register = lazy(() => import("../pages/Register"))
 const SplashScreen = lazy(() => import("../pages/SplashScreen"))
 const Artificialintelligence = lazy(() => import("../pages/Artificialintelligence"))
@@ -46,6 +48,10 @@ const router = createBrowserRouter([
             element: withSuspense(<Message />),
           },
           {
+            path: "messages",
+            element: withSuspense(<Message />),
+          },
+          {
             path: "left",
             element: withSuspense(<LeftRoutes />),
           },
@@ -68,6 +74,14 @@ const router = createBrowserRouter([
           {
             path: "search",
             element: withSuspense(<Search />),
+          },
+          {
+            path: "profile",
+            element: withSuspense(<Profile />),
+          },
+          {
+            path: "post",
+            element: withSuspense(<CreatePost />),
           },
         ],
       },

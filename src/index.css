@@ -10,7 +10,9 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  @apply bg-slate-200
+  @apply bg-slate-200;
+  background-color: var(--hx-app-bg, #e2e8f0);
+  color: var(--hx-text, #000);
 }
 
 code {
@@ -25,4 +27,14 @@ code {
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+:root {
+  --hx-app-bg: #e2e8f0;
+  --hx-text: #000;
+}
+
+:root[data-theme="dark"] {
+  --hx-app-bg: #0b0b0e;
+  --hx-text: #f3f3f3;
 }
