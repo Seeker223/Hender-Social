@@ -14,8 +14,8 @@ const Post = (props) => {
       type='button'
       aria-label={label}
       onClick={onClick}
-      className={`flex items-center gap-1 rounded px-1.5 py-1 text-black transition-colors ${
-        active ? 'bg-[#ffe3f1]' : 'hover:bg-[#f4f4f4]'
+      className={`flex items-center gap-1 rounded p-1 text-black transition-colors ${
+        active ? 'text-[#e4006e]' : 'text-black'
       }`}
     >
       {children}
@@ -24,8 +24,8 @@ const Post = (props) => {
 
   const Svg = ({ children }) => (
     <svg
-      width='18'
-      height='18'
+      width='22'
+      height='22'
       viewBox='0 0 24 24'
       fill='none'
       xmlns='http://www.w3.org/2000/svg'
@@ -38,14 +38,14 @@ const Post = (props) => {
   const ReXendIcon = ({ active }) => (
     <Svg>
       <path
-        d='M7 7h10l-2-2m2 2-2 2'
+        d='M22 2 11 13'
         stroke='currentColor'
         strokeWidth='2'
         strokeLinecap='round'
         strokeLinejoin='round'
       />
       <path
-        d='M17 17H7l2 2m-2-2 2-2'
+        d='M22 2 15 22l-4-9-9-4 20-7Z'
         stroke='currentColor'
         strokeWidth='2'
         strokeLinecap='round'
@@ -101,7 +101,7 @@ const Post = (props) => {
   const CommentIcon = () => (
     <Svg>
       <path
-        d='M5 6h14v9H8l-3 3V6Z'
+        d='M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z'
         stroke='currentColor'
         strokeWidth='2'
         strokeLinecap='round'
@@ -161,14 +161,13 @@ const Post = (props) => {
 
       <p className='px-1 pt-1 text-lg font-bold leading-6 text-black'>you and {props.react} reacted</p>
 
-      <div className='mx-1 mt-2 flex items-center justify-between rounded border border-[#e6e6e6] bg-white px-1 py-1 text-black'>
+      <div className='mx-1 mt-2 flex items-center justify-between text-black'>
         <IconButton
           active={reXended}
           label='Re-xend'
           onClick={() => setReXended((v) => !v)}
         >
           <ReXendIcon active={reXended} />
-          <span className='text-xs font-semibold'>re-xend</span>
         </IconButton>
 
         <IconButton
@@ -180,7 +179,7 @@ const Post = (props) => {
           }}
         >
           <LikeIcon active={liked} />
-          <span className='text-xs font-semibold'>{likeCount}</span>
+          <span className='text-xs font-semibold text-black/70'>{likeCount}</span>
         </IconButton>
 
         <IconButton
@@ -196,12 +195,12 @@ const Post = (props) => {
 
         <IconButton active={false} label='Comments' onClick={() => {}}>
           <CommentIcon />
-          <span className='text-xs font-semibold'>{commentCount}</span>
+          <span className='text-xs font-semibold text-black/70'>{commentCount}</span>
         </IconButton>
 
-        <div className='flex items-center gap-1 px-1.5 py-1 text-black'>
+        <div className='flex items-center gap-1 p-1 text-black'>
           <EyeIcon />
-          <span className='text-xs font-semibold'>{viewCount}</span>
+          <span className='text-xs font-semibold text-black/70'>{viewCount}</span>
         </div>
       </div>
 
