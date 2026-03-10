@@ -8,6 +8,7 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
   const lastPointerYRef = useRef(null)
   const startPointerYRef = useRef(null)
   const isDraggingRef = useRef(false)
+  const dragHappenedRef = useRef(false)
 
   const STEP_PX = 36
   const MAX_CYCLES_PER_EVENT = 6
@@ -58,15 +59,11 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
   }
 
   const handlePointerDown = (event) => {
-    // Allow avatar button taps/clicks to work.
-    if (event.target?.closest?.('button')) {
-      return
-    }
-
     pointerDownRef.current = true
     lastPointerYRef.current = event.clientY
     startPointerYRef.current = event.clientY
     isDraggingRef.current = false
+    dragHappenedRef.current = false
     accumulatedDeltaRef.current = 0
   }
 
@@ -81,6 +78,7 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
       const totalDelta = startY - currentY
       if (Math.abs(totalDelta) >= DRAG_START_PX) {
         isDraggingRef.current = true
+        dragHappenedRef.current = true
         if (event.currentTarget.setPointerCapture) {
           event.currentTarget.setPointerCapture(event.pointerId)
         }
@@ -101,6 +99,9 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
     startPointerYRef.current = null
     isDraggingRef.current = false
     accumulatedDeltaRef.current = 0
+
+    // Let the subsequent click event fire normally if there was no drag.
+    // If there was a drag, keep this true until the click-capture sees it.
   }
 
   return (
@@ -111,6 +112,15 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUpOrCancel}
       onPointerCancel={handlePointerUpOrCancel}
+      onClickCapture={(event) => {
+        // If the gesture turned into a drag, suppress avatar click/modal.
+        if (dragHappenedRef.current) {
+          event.preventDefault()
+          event.stopPropagation()
+          // Reset after suppressing the first click following the drag.
+          dragHappenedRef.current = false
+        }
+      }}
     >
       <div className='flex flex-col items-center gap-2'>
         {isLoading
