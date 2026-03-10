@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import Top from '../components/Top'
 import Bottom from '../components/Bottom'
 import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
+import UserModal from '../components/UserModal'
 
 const Home = () => {
   const currentUser = useMemo(() => getCurrentMockUser(), [])
@@ -11,6 +12,8 @@ const Home = () => {
   const [rightCircles, setRightCircles] = useState(() => userFriends.slice(6, 36))
   const [badgeCircles, setBadgeCircles] = useState([])
   const [isFriendsLoading, setIsFriendsLoading] = useState(true)
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false)
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -84,14 +87,27 @@ const Home = () => {
           topCircles={topCircles}
           badgeCount={badgeCircles.length}
           isLoading={isFriendsLoading}
+          onCircleClick={(friend) => {
+            setSelectedUser(friend)
+            setIsUserModalOpen(true)
+          }}
         />
         <Bottom
           rightCircles={rightCircles}
           onRightScrollDown={handleRightScrollDown}
           onRightScrollUp={handleRightScrollUp}
           isLoading={isFriendsLoading}
+          onRightCircleClick={(friend) => {
+            setSelectedUser(friend)
+            setIsUserModalOpen(true)
+          }}
         />
       </div>
+      <UserModal
+        isOpen={isUserModalOpen}
+        user={selectedUser}
+        onClose={() => setIsUserModalOpen(false)}
+      />
     </section>
   )
 }

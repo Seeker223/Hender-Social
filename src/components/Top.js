@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 
 
 
-const Top = ({ topCircles = [], badgeCount = 0, isLoading = false }) => {
+const Top = ({ topCircles = [], badgeCount = 0, isLoading = false, onCircleClick }) => {
   const visibleCircles = topCircles.slice(0, 6)
   return (
     <header className='flex h-16 w-full items-center gap-2 bg-[#efefef] px-1'>
@@ -35,6 +35,7 @@ const Top = ({ topCircles = [], badgeCount = 0, isLoading = false }) => {
                 name={friend.name}
                 showBadge
                 badgeKey={friend.id}
+                onClick={() => onCircleClick?.(friend)}
               />
             ))}
       </div>

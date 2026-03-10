@@ -27,18 +27,24 @@ const Circle = ({
   fetchPriority = 'low',
   showBadge = false,
   badgeKey = '',
+  onClick,
 }) => {
   const badgeColor = showBadge ? colorFromKey(badgeKey || name) : null
 
   return (
-    <div className={`${size} ${className} relative inline-block`}>
+    <button
+      type='button'
+      className={`${size} ${className} relative inline-block`}
+      onClick={onClick}
+      aria-label={name}
+    >
       <img
         src={src}
-        className='h-full w-full cursor-pointer rounded-full border-2 border-[#ff2c7b] object-cover'
+        className='h-full w-full rounded-full border-2 border-[#ff2c7b] object-cover'
         alt={name}
         title={name}
-        loading="lazy"
-        decoding="async"
+        loading='lazy'
+        decoding='async'
         fetchPriority={fetchPriority}
       />
       {showBadge && (
@@ -47,7 +53,7 @@ const Circle = ({
           style={{ backgroundColor: badgeColor }}
         />
       )}
-    </div>
+    </button>
   )
 }
 

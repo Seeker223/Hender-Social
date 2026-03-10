@@ -2,13 +2,16 @@
 import React, { useRef } from 'react'
 import Circle from '../components/Circle'
 
-const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) => {
+const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCircleClick }) => {
   const accumulatedDeltaRef = useRef(0)
   const pointerDownRef = useRef(false)
   const lastPointerYRef = useRef(null)
+  const startPointerYRef = useRef(null)
+  const isDraggingRef = useRef(false)
 
   const STEP_PX = 36
   const MAX_CYCLES_PER_EVENT = 6
+  const DRAG_START_PX = 6
 
   const cycleByDirection = (direction, count = 1) => {
     if (count <= 0) {
@@ -55,12 +58,16 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) =>
   }
 
   const handlePointerDown = (event) => {
+    // Allow avatar button taps/clicks to work.
+    if (event.target?.closest?.('button')) {
+      return
+    }
+
     pointerDownRef.current = true
     lastPointerYRef.current = event.clientY
+    startPointerYRef.current = event.clientY
+    isDraggingRef.current = false
     accumulatedDeltaRef.current = 0
-    if (event.currentTarget.setPointerCapture) {
-      event.currentTarget.setPointerCapture(event.pointerId)
-    }
   }
 
   const handlePointerMove = (event) => {
@@ -69,14 +76,30 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) =>
     }
 
     const currentY = event.clientY
-    const deltaY = lastPointerYRef.current - currentY
-    processDelta(deltaY)
+    const startY = startPointerYRef.current
+    if (!isDraggingRef.current && typeof startY === 'number') {
+      const totalDelta = startY - currentY
+      if (Math.abs(totalDelta) >= DRAG_START_PX) {
+        isDraggingRef.current = true
+        if (event.currentTarget.setPointerCapture) {
+          event.currentTarget.setPointerCapture(event.pointerId)
+        }
+      }
+    }
+
+    if (isDraggingRef.current) {
+      const deltaY = lastPointerYRef.current - currentY
+      processDelta(deltaY)
+    }
+
     lastPointerYRef.current = currentY
   }
 
   const handlePointerUpOrCancel = () => {
     pointerDownRef.current = false
     lastPointerYRef.current = null
+    startPointerYRef.current = null
+    isDraggingRef.current = false
     accumulatedDeltaRef.current = 0
   }
 
@@ -105,6 +128,7 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) =>
                 name={friend.name}
                 showBadge
                 badgeKey={friend.id}
+                onClick={() => onCircleClick?.(friend)}
               />
             ))}
       </div>
