@@ -3,10 +3,9 @@ import React, { useRef } from 'react'
 import Circle from '../components/Circle'
 
 const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) => {
-  const railRef = useRef(null)
-  const lastScrollTopRef = useRef(0)
-  const isResettingRef = useRef(false)
   const accumulatedDeltaRef = useRef(0)
+  const pointerDownRef = useRef(false)
+  const lastPointerYRef = useRef(null)
 
   const STEP_PX = 36
   const MAX_CYCLES_PER_EVENT = 6
@@ -52,44 +51,43 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false }) =>
   }
 
   const handleWheel = (event) => {
-    // Keep desktop wheel working even if the rail is scrollable.
     processDelta(event.deltaY)
   }
 
-  const handleScroll = (event) => {
-    if (isResettingRef.current) {
+  const handlePointerDown = (event) => {
+    pointerDownRef.current = true
+    lastPointerYRef.current = event.clientY
+    accumulatedDeltaRef.current = 0
+    if (event.currentTarget.setPointerCapture) {
+      event.currentTarget.setPointerCapture(event.pointerId)
+    }
+  }
+
+  const handlePointerMove = (event) => {
+    if (!pointerDownRef.current || typeof lastPointerYRef.current !== 'number') {
       return
     }
 
-    const currentTop = event.currentTarget.scrollTop
-    const delta = currentTop - lastScrollTopRef.current
-    lastScrollTopRef.current = currentTop
+    const currentY = event.clientY
+    const deltaY = lastPointerYRef.current - currentY
+    processDelta(deltaY)
+    lastPointerYRef.current = currentY
+  }
 
-    // Ignore tiny moves; reduces noise and keeps cycling snappy.
-    if (Math.abs(delta) < 2) {
-      return
-    }
-
-    processDelta(delta)
-
-    // Reset scroll position to avoid drift/jank while still allowing touch scroll gestures.
-    isResettingRef.current = true
-    requestAnimationFrame(() => {
-      if (railRef.current) {
-        railRef.current.scrollTop = 0
-      }
-      lastScrollTopRef.current = 0
-      accumulatedDeltaRef.current = 0
-      isResettingRef.current = false
-    })
+  const handlePointerUpOrCancel = () => {
+    pointerDownRef.current = false
+    lastPointerYRef.current = null
+    accumulatedDeltaRef.current = 0
   }
 
   return (
     <aside
-      ref={railRef}
-      className='no-scrollbar h-full w-[58px] overflow-y-auto overscroll-contain bg-[#efefef] py-1 select-none'
+      className='no-scrollbar h-full w-[58px] touch-none overflow-hidden bg-[#efefef] py-1 select-none'
       onWheel={handleWheel}
-      onScroll={handleScroll}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUpOrCancel}
+      onPointerCancel={handlePointerUpOrCancel}
     >
       <div className='flex flex-col items-center gap-2'>
         {isLoading
