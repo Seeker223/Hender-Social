@@ -1,7 +1,112 @@
 import React from 'react'
-import {AiOutlineLike,AiOutlineMessage,AiOutlineHome,AiOutlinePhone,AiOutlineSearch } from 'react-icons/ai'
 
 const Post = (props) => {
+  const [liked, setLiked] = React.useState(false)
+  const [disliked, setDisliked] = React.useState(false)
+  const [reXended, setReXended] = React.useState(false)
+
+  const likeCount = Number.isFinite(Number(props.react)) ? Number(props.react) : 0
+  const commentCount = Number.isFinite(Number(props.comments)) ? Number(props.comments) : 0
+  const viewCount = Number.isFinite(Number(props.views)) ? Number(props.views) : 0
+
+  const IconButton = ({ active, label, onClick, children }) => (
+    <button
+      type='button'
+      aria-label={label}
+      onClick={onClick}
+      className={`flex items-center gap-1 rounded px-1.5 py-1 text-black transition-colors ${
+        active ? 'bg-[#ffe3f1]' : 'hover:bg-[#f4f4f4]'
+      }`}
+    >
+      {children}
+    </button>
+  )
+
+  const Svg = ({ children }) => (
+    <svg
+      width='18'
+      height='18'
+      viewBox='0 0 24 24'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+      className='shrink-0'
+    >
+      {children}
+    </svg>
+  )
+
+  const ReXendIcon = ({ active }) => (
+    <Svg>
+      <path
+        d='M7 7h10l-2-2m2 2-2 2'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M17 17H7l2 2m-2-2 2-2'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        opacity={active ? '1' : '0.65'}
+      />
+    </Svg>
+  )
+
+  const LikeIcon = ({ active }) => (
+    <Svg>
+      <path
+        d='M12 4 6 10h4v10h4V10h4L12 4Z'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinejoin='round'
+        opacity={active ? '1' : '0.75'}
+      />
+    </Svg>
+  )
+
+  const DislikeIcon = ({ active }) => (
+    <Svg>
+      <path
+        d='M12 20 6 14h4V4h4v10h4l-6 6Z'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinejoin='round'
+        opacity={active ? '1' : '0.75'}
+      />
+    </Svg>
+  )
+
+  const CommentIcon = () => (
+    <Svg>
+      <path
+        d='M5 6h14v9H8l-3 3V6Z'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinejoin='round'
+      />
+    </Svg>
+  )
+
+  const EyeIcon = () => (
+    <Svg>
+      <path
+        d='M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7S2.5 12 2.5 12Z'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinejoin='round'
+      />
+    </Svg>
+  )
+
   return (
     <article className='w-full border-b border-[#d4d4d4] bg-[#efefef] pb-2'>
       <div className='flex items-center gap-2 px-1 py-1'>
@@ -34,13 +139,48 @@ const Post = (props) => {
 
       <p className='px-1 pt-1 text-lg font-bold leading-6 text-black'>you and {props.react} reacted</p>
 
-      <div className='flex items-center justify-between px-1 pt-1 text-black'>
-        <AiOutlineLike size={30} />
-        <AiOutlineMessage size={30} />
-        <AiOutlineHome size={30} />
-        <AiOutlinePhone size={30} />
-        <AiOutlineSearch size={30} />
-        <p className='border border-[#2b5da9] px-2 text-base leading-7'>re-xend</p>
+      <div className='mx-1 mt-2 flex items-center justify-between rounded border border-[#e6e6e6] bg-white px-1 py-1 text-black'>
+        <IconButton
+          active={reXended}
+          label='Re-xend'
+          onClick={() => setReXended((v) => !v)}
+        >
+          <ReXendIcon active={reXended} />
+          <span className='text-xs font-semibold'>re-xend</span>
+        </IconButton>
+
+        <IconButton
+          active={liked}
+          label='Like'
+          onClick={() => {
+            setLiked((v) => !v)
+            setDisliked(false)
+          }}
+        >
+          <LikeIcon active={liked} />
+          <span className='text-xs font-semibold'>{likeCount}</span>
+        </IconButton>
+
+        <IconButton
+          active={disliked}
+          label='Dislike'
+          onClick={() => {
+            setDisliked((v) => !v)
+            setLiked(false)
+          }}
+        >
+          <DislikeIcon active={disliked} />
+        </IconButton>
+
+        <IconButton active={false} label='Comments' onClick={() => {}}>
+          <CommentIcon />
+          <span className='text-xs font-semibold'>{commentCount}</span>
+        </IconButton>
+
+        <div className='flex items-center gap-1 px-1.5 py-1 text-black'>
+          <EyeIcon />
+          <span className='text-xs font-semibold'>{viewCount}</span>
+        </div>
       </div>
 
       <p className='px-1 text-lg leading-6 text-black'>Post-most-comment</p>
