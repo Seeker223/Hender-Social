@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkclientend=self.webpackChunkclientend||[]).push([[904],{8904:(e,l,s)=>{s.r(l),s.d(l,{default:()=>c});s(4901);var t=s(9473);const c=()=>(0,t.jsxs)("div",{className:"p-3 text-black",children:[(0,t.jsx)("h1",{className:"text-xl font-bold",children:"Profile"}),(0,t.jsx)("p",{className:"mt-2 text-sm text-black/70",children:"Mock profile page."})]})}}]);
+//# sourceMappingURL=904.e3388946.chunk.js.map

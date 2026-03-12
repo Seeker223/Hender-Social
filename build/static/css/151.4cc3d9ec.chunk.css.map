@@ -1,1 +1,0 @@
-{"version":3,"file":"static/css/151.4cc3d9ec.chunk.css","mappings":"AAAA,GACI,YAEJ,CAEA,MACI,gDACJ","sources":["pages/SplashScreen.css"],"sourcesContent":["h1{\r\n    color:213547;\r\n\r\n}\r\n\r\n.body{\r\n    background: linear-gradient(90deg,purple,#E91E83);\r\n}\r\n"],"names":[],"sourceRoot":""}

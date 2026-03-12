@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/935.e5e9f37a.chunk.js","mappings":"wJAEA,MAMA,EANcA,KAEVC,EAAAA,EAAAA,KAAA,OAAAC,SAAK,S","sources":["components/Photo.js"],"sourcesContent":["import React from 'react'\r\n\r\nconst Photo = () => {\r\n  return (\r\n    <div>Photo</div>\r\n  )\r\n}\r\n\r\nexport default Photo"],"names":["Photo","_jsx","children"],"sourceRoot":""}
