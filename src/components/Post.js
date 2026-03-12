@@ -151,7 +151,7 @@ const Post = (props) => {
 
       <div className='mx-1 overflow-hidden border border-[var(--hx-border)] bg-[var(--hx-surface-2)]'>
         <img
-          src={props.img}
+          src={props.postImg ?? props.img}
           className='h-[240px] w-full object-cover'
           alt='post'
           loading="lazy"

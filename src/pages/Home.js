@@ -15,6 +15,12 @@ const Home = () => {
   const [selectedUser, setSelectedUser] = useState(null)
   const [isUserModalOpen, setIsUserModalOpen] = useState(false)
 
+  const activePostImg = useMemo(() => {
+    if (badgeCircles.length === 0) return null
+    const last = badgeCircles[badgeCircles.length - 1]
+    return last?.avatar ?? null
+  }, [badgeCircles])
+
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setIsFriendsLoading(false)
@@ -97,6 +103,7 @@ const Home = () => {
           onRightScrollDown={handleRightScrollDown}
           onRightScrollUp={handleRightScrollUp}
           isLoading={isFriendsLoading}
+          activePostImg={activePostImg}
           onRightCircleClick={(friend) => {
             setSelectedUser(friend)
             setIsUserModalOpen(true)

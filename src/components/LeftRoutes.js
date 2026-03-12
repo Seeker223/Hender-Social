@@ -12,7 +12,7 @@ import p8 from '../assets/male/p8.jpg'
 import avatar from '../assets/avatar.png'
 import { useEffect, useState } from 'react'
 
-const LeftRoutes = ({ isLoading = false }) => {
+const LeftRoutes = ({ isLoading = false, activePostImg = null }) => {
   const [isPostLoading, setIsPostLoading] = useState(true)
 
   useEffect(() => {
@@ -45,7 +45,13 @@ const LeftRoutes = ({ isLoading = false }) => {
 
   return (
     <section className='h-full w-full overflow-y-auto bg-[var(--hx-app-bg)]'>
-      <Post name='ztsambad' img={hlogo2} text='efjfhjkfvdzjhnmcckn,mcn,xnc.xjfkl lcjdxc' react='21' />
+      <Post
+        name='ztsambad'
+        img={hlogo2}
+        postImg={activePostImg || hlogo2}
+        text='efjfhjkfvdzjhnmcckn,mcn,xnc.xjfkl lcjdxc'
+        react='21'
+      />
       <Post name='' img={p1} text='' react='4' />
       <Post name='' img={avatar} text='' react='44' />
       <Post name='' img={p2} text='' react='34' />
