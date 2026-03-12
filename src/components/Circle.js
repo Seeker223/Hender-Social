@@ -49,7 +49,7 @@ const Circle = ({
       />
       {showBadge && (
         <span
-          className='absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full ring-2 ring-white'
+          className='absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full ring-2 ring-white'
           style={{ backgroundColor: badgeColor }}
         />
       )}
