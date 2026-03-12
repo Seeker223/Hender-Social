@@ -11,7 +11,7 @@ const Top = ({ topCircles = [], badgeCount = 0, isLoading = false, onCircleClick
   const mainCircles = visibleCircles.slice(0, 5)
   const alignedCircle = visibleCircles[5]
   return (
-    <header className='flex h-16 w-full items-center gap-2 bg-[var(--hx-surface-2)] px-1'>
+    <header className='grid h-16 w-full grid-cols-[48px_minmax(0,1fr)_58px] items-center gap-2 bg-[var(--hx-surface-2)] px-1'>
       <Link to='/home/left' className='relative h-12 w-12 shrink-0'>
         <img src={hlogo2} className='h-full w-full object-contain' alt='logo' />
         {badgeCount > 0 && (
@@ -20,7 +20,7 @@ const Top = ({ topCircles = [], badgeCount = 0, isLoading = false, onCircleClick
           </span>
         )}
       </Link>
-      <div className='flex flex-1 items-center gap-1 overflow-hidden pr-1'>
+      <div className='flex min-w-0 items-center gap-1 overflow-hidden pr-1'>
         {isLoading
           ? Array.from({ length: 5 }).map((_, index) => (
               <div
