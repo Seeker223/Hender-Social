@@ -1,4 +1,25 @@
-import avatar from '../assets/avatar.png'
+import m1 from '../assets/male/p1.jpg'
+import m2 from '../assets/male/p2.jpg'
+import m3 from '../assets/male/p3.jpg'
+import m4 from '../assets/male/p4.jpg'
+import m5 from '../assets/male/p5.jpg'
+import m6 from '../assets/male/p6.jpg'
+import m8 from '../assets/male/p8.jpg'
+import m9 from '../assets/male/p9.jpg'
+import f1 from '../assets/female/1.jpg'
+import f2 from '../assets/female/2.jpg'
+import f3 from '../assets/female/3.jpg'
+import f4 from '../assets/female/4.jpg'
+import f5 from '../assets/female/5.jpg'
+import f6 from '../assets/female/6.jpg'
+import f7 from '../assets/female/7.jpg'
+import f9 from '../assets/female/9.jpg'
+import f10 from '../assets/female/10.jpg'
+import f11 from '../assets/female/11.jpg'
+import f12 from '../assets/female/12.jpg'
+
+// All images in this pool are already < 500KB on disk in this repo.
+const AVATAR_POOL = [m1, f1, m2, f2, m3, f3, m4, f4, m5, f5, m6, f6, m8, f7, m9, f9, f10, f11, f12]
 
 const MOCK_USERS_KEY = 'hender_mock_users'
 const MOCK_SESSION_KEY = 'hender_mock_session'
@@ -27,6 +48,7 @@ const FRIEND_NAMES = [
 export const MOCK_FRIENDS = Array.from({ length: 48 }, (_, index) => {
   const id = `f${index + 1}`
   const name = FRIEND_NAMES[index] || `Friend ${index + 1}`
+  const avatar = AVATAR_POOL[index % AVATAR_POOL.length]
   return { id, name, avatar }
 })
 
