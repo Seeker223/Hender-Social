@@ -4,6 +4,8 @@ import Circle from '../components/Circle'
 
 const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCircleClick }) => {
   const accumulatedDeltaRef = useRef(0)
+  const pendingDeltaRef = useRef(0)
+  const rafIdRef = useRef(0)
   const pointerDownRef = useRef(false)
   const lastPointerYRef = useRef(null)
   const startPointerYRef = useRef(null)
@@ -53,8 +55,32 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
         : accumulatedDeltaRef.current + cycles * STEP_PX
   }
 
+  function queueDelta(deltaY) {
+    if (deltaY !== 0) {
+      pendingDeltaRef.current += deltaY
+    }
+
+    if (rafIdRef.current) {
+      return
+    }
+
+    if (typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') {
+      flushPending()
+      return
+    }
+
+    rafIdRef.current = window.requestAnimationFrame(flushPending)
+  }
+
+  function flushPending() {
+    rafIdRef.current = 0
+    const delta = pendingDeltaRef.current
+    pendingDeltaRef.current = 0
+    processDelta(delta)
+  }
+
   const handleWheel = (event) => {
-    processDelta(event.deltaY)
+    queueDelta(event.deltaY)
   }
 
   const handlePointerDown = (event) => {
@@ -89,7 +115,7 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
 
     if (isDraggingRef.current) {
       const deltaY = lastPointerYRef.current - currentY
-      processDelta(deltaY)
+      queueDelta(deltaY)
     }
 
     lastPointerYRef.current = currentY
@@ -156,7 +182,7 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
 
     if (isDraggingRef.current) {
       const deltaY = lastPointerYRef.current - currentY
-      processDelta(deltaY)
+      queueDelta(deltaY)
     }
 
     lastPointerYRef.current = currentY
@@ -189,24 +215,19 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
       }}
     >
       <div className='flex flex-col items-center gap-2'>
-        {isLoading
-          ? Array.from({ length: 10 }).map((_, index) => (
-              <div
-                key={`right-skeleton-${index + 1}`}
-                className='h-11 w-11 animate-pulse rounded-full border-2 border-[#ffd2e5] bg-[#f1f1f1]'
-              />
-            ))
-          : circles.map((friend) => (
-              <Circle
-                key={friend.id}
-                size='h-11 w-11'
-                src={friend.avatar}
-                name={friend.name}
-                showBadge
-                badgeKey={friend.id}
-                onClick={() => onCircleClick?.(friend)}
-              />
-            ))}
+        {circles.map((friend) => (
+          <Circle
+            key={friend.id}
+            size='h-11 w-11'
+            src={friend.avatar}
+            name={friend.name}
+            placeholder={isLoading}
+            showBadge={!isLoading}
+            badgeKey={friend.id}
+            payload={friend}
+            onSelect={onCircleClick}
+          />
+        ))}
       </div>
     </aside>
   )

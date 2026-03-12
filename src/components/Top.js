@@ -19,25 +19,20 @@ const Top = ({ topCircles = [], badgeCount = 0, isLoading = false, onCircleClick
         )}
       </Link>
       <div className='flex flex-1 items-center gap-1 overflow-hidden pr-1'>
-        {isLoading
-          ? Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={`top-skeleton-${index + 1}`}
-                className='h-12 w-12 shrink-0 animate-pulse rounded-full border-2 border-[#ffd2e5] bg-[#f1f1f1]'
-              />
-            ))
-          : visibleCircles.map((friend) => (
-              <Circle
-                key={friend.id}
-                size='h-12 w-12'
-                className='shrink-0'
-                src={friend.avatar}
-                name={friend.name}
-                showBadge
-                badgeKey={friend.id}
-                onClick={() => onCircleClick?.(friend)}
-              />
-            ))}
+        {visibleCircles.map((friend) => (
+          <Circle
+            key={friend.id}
+            size='h-12 w-12'
+            className='shrink-0'
+            src={friend.avatar}
+            name={friend.name}
+            placeholder={isLoading}
+            showBadge={!isLoading}
+            badgeKey={friend.id}
+            payload={friend}
+            onSelect={onCircleClick}
+          />
+        ))}
       </div>
     </header>
   )

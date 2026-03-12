@@ -15,6 +15,7 @@ const Home = () => {
     badge: [],
   }))
   const [isFriendsLoading, setIsFriendsLoading] = useState(true)
+  const [areAvatarsReady, setAreAvatarsReady] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
   const [isUserModalOpen, setIsUserModalOpen] = useState(false)
 
@@ -31,6 +32,41 @@ const Home = () => {
 
     return () => clearTimeout(timeoutId)
   }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    const uniqueSrcs = Array.from(
+      new Set((userFriends || []).map((friend) => friend?.avatar).filter(Boolean))
+    )
+
+    const preload = async () => {
+      try {
+        await Promise.all(
+          uniqueSrcs.map((src) => {
+            const img = new Image()
+            img.src = src
+            if (typeof img.decode === 'function') {
+              return img.decode().catch(() => undefined)
+            }
+            return new Promise((resolve) => {
+              img.onload = () => resolve()
+              img.onerror = () => resolve()
+            })
+          })
+        )
+      } finally {
+        if (!cancelled) {
+          setAreAvatarsReady(true)
+        }
+      }
+    }
+
+    preload()
+
+    return () => {
+      cancelled = true
+    }
+  }, [userFriends])
 
   const handleRightScrollDown = useCallback((count = 1) => {
     if (isFriendsLoading) {
@@ -94,6 +130,13 @@ const Home = () => {
     })
   }, [isFriendsLoading])
 
+  const isCircleUiLoading = isFriendsLoading || !areAvatarsReady
+  const handleCircleClick = useCallback((friend) => {
+    if (!friend) return
+    setSelectedUser(friend)
+    setIsUserModalOpen(true)
+  }, [])
+
   return (
     <section className='min-h-screen w-full bg-[var(--hx-app-bg)] py-2 sm:py-4'>
       <div className='mx-auto h-[100dvh] max-h-[760px] w-full max-w-[390px] overflow-hidden border border-[#e4006e] bg-[var(--hx-surface)] shadow-lg'>
@@ -106,23 +149,17 @@ const Home = () => {
           <Top
             topCircles={circleState.top}
             badgeCount={circleState.badge.length}
-            isLoading={isFriendsLoading}
-            onCircleClick={(friend) => {
-              setSelectedUser(friend)
-              setIsUserModalOpen(true)
-            }}
+            isLoading={isCircleUiLoading}
+            onCircleClick={handleCircleClick}
           />
           <Bottom
             rightCircles={circleState.right}
             onRightScrollDown={handleRightScrollDown}
             onRightScrollUp={handleRightScrollUp}
-            isLoading={isFriendsLoading}
+            isLoading={isCircleUiLoading}
             activePostImg={activePostImg}
             activePostBadgeCount={circleState.badge.length}
-            onRightCircleClick={(friend) => {
-              setSelectedUser(friend)
-              setIsUserModalOpen(true)
-            }}
+            onRightCircleClick={handleCircleClick}
           />
         </FeedProvider>
       </div>
