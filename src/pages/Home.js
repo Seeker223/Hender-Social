@@ -3,6 +3,7 @@ import Top from '../components/Top'
 import Bottom from '../components/Bottom'
 import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
 import UserModal from '../components/UserModal'
+import { FeedProvider } from '../context/FeedContext'
 
 const Home = () => {
   const currentUser = useMemo(() => getCurrentMockUser(), [])
@@ -89,27 +90,34 @@ const Home = () => {
   return (
     <section className='min-h-screen w-full bg-[var(--hx-app-bg)] py-2 sm:py-4'>
       <div className='mx-auto h-[100dvh] max-h-[760px] w-full max-w-[390px] overflow-hidden border border-[#e4006e] bg-[var(--hx-surface)] shadow-lg'>
-        <Top
-          topCircles={topCircles}
-          badgeCount={badgeCircles.length}
-          isLoading={isFriendsLoading}
-          onCircleClick={(friend) => {
-            setSelectedUser(friend)
-            setIsUserModalOpen(true)
+        <FeedProvider
+          value={{
+            activePostImg,
+            activePostBadgeCount: badgeCircles.length,
           }}
-        />
-        <Bottom
-          rightCircles={rightCircles}
-          onRightScrollDown={handleRightScrollDown}
-          onRightScrollUp={handleRightScrollUp}
-          isLoading={isFriendsLoading}
-          activePostImg={activePostImg}
-          activePostBadgeCount={badgeCircles.length}
-          onRightCircleClick={(friend) => {
-            setSelectedUser(friend)
-            setIsUserModalOpen(true)
-          }}
-        />
+        >
+          <Top
+            topCircles={topCircles}
+            badgeCount={badgeCircles.length}
+            isLoading={isFriendsLoading}
+            onCircleClick={(friend) => {
+              setSelectedUser(friend)
+              setIsUserModalOpen(true)
+            }}
+          />
+          <Bottom
+            rightCircles={rightCircles}
+            onRightScrollDown={handleRightScrollDown}
+            onRightScrollUp={handleRightScrollUp}
+            isLoading={isFriendsLoading}
+            activePostImg={activePostImg}
+            activePostBadgeCount={badgeCircles.length}
+            onRightCircleClick={(friend) => {
+              setSelectedUser(friend)
+              setIsUserModalOpen(true)
+            }}
+          />
+        </FeedProvider>
       </div>
       <UserModal
         isOpen={isUserModalOpen}

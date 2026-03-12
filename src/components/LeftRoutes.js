@@ -11,9 +11,17 @@ import p7 from '../assets/male/p7.jpg'
 import p8 from '../assets/male/p8.jpg'
 import avatar from '../assets/avatar.png'
 import { useEffect, useState } from 'react'
+import { useFeed } from '../context/FeedContext'
 
 const LeftRoutes = ({ isLoading = false, activePostImg = null, activePostBadgeCount = 0 }) => {
   const [isPostLoading, setIsPostLoading] = useState(true)
+  const feed = useFeed()
+
+  const resolvedPostImg = activePostImg ?? feed.activePostImg
+  const resolvedBadgeCount =
+    Number.isFinite(Number(activePostBadgeCount)) && Number(activePostBadgeCount) > 0
+      ? Number(activePostBadgeCount)
+      : Number(feed.activePostBadgeCount) || 0
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -48,8 +56,8 @@ const LeftRoutes = ({ isLoading = false, activePostImg = null, activePostBadgeCo
       <Post
         name='ztsambad'
         img={hlogo2}
-        postImg={activePostImg || hlogo2}
-        badgeCount={activePostBadgeCount}
+        postImg={resolvedPostImg || hlogo2}
+        badgeCount={resolvedBadgeCount}
         text='efjfhjkfvdzjhnmcckn,mcn,xnc.xjfkl lcjdxc'
         react='21'
       />
