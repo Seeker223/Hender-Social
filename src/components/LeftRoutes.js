@@ -12,7 +12,7 @@ import p8 from '../assets/male/p8.jpg'
 import avatar from '../assets/avatar.png'
 import { useEffect, useState } from 'react'
 
-const LeftRoutes = ({ isLoading = false, activePostImg = null }) => {
+const LeftRoutes = ({ isLoading = false, activePostImg = null, activePostBadgeCount = 0 }) => {
   const [isPostLoading, setIsPostLoading] = useState(true)
 
   useEffect(() => {
@@ -49,6 +49,7 @@ const LeftRoutes = ({ isLoading = false, activePostImg = null }) => {
         name='ztsambad'
         img={hlogo2}
         postImg={activePostImg || hlogo2}
+        badgeCount={activePostBadgeCount}
         text='efjfhjkfvdzjhnmcckn,mcn,xnc.xjfkl lcjdxc'
         react='21'
       />

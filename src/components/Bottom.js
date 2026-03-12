@@ -10,6 +10,7 @@ const Bottom = ({
   onRightScrollUp,
   isLoading = false,
   activePostImg,
+  activePostBadgeCount = 0,
   onRightCircleClick,
 }) => {
   return (
@@ -17,7 +18,11 @@ const Bottom = ({
      
       <div className='relative flex h-[calc(100%-3rem)] w-full'>
        
-        <Left isLoading={isLoading} activePostImg={activePostImg} />
+        <Left
+          isLoading={isLoading}
+          activePostImg={activePostImg}
+          activePostBadgeCount={activePostBadgeCount}
+        />
         <Right
           circles={rightCircles}
           onScrollDown={onRightScrollDown}

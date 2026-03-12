@@ -104,6 +104,7 @@ const Home = () => {
           onRightScrollUp={handleRightScrollUp}
           isLoading={isFriendsLoading}
           activePostImg={activePostImg}
+          activePostBadgeCount={badgeCircles.length}
           onRightCircleClick={(friend) => {
             setSelectedUser(friend)
             setIsUserModalOpen(true)

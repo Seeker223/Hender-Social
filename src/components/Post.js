@@ -149,7 +149,7 @@ const Post = (props) => {
         {props.text}
       </div>
 
-      <div className='mx-1 overflow-hidden border border-[var(--hx-border)] bg-[var(--hx-surface-2)]'>
+      <div className='relative mx-1 overflow-hidden border border-[var(--hx-border)] bg-[var(--hx-surface-2)]'>
         <img
           src={props.postImg ?? props.img}
           className='h-[240px] w-full object-cover'
@@ -157,6 +157,11 @@ const Post = (props) => {
           loading="lazy"
           decoding="async"
         />
+        {Number.isFinite(Number(props.badgeCount)) && Number(props.badgeCount) > 0 ? (
+          <div className='absolute left-2 top-2 grid h-7 min-w-7 place-items-center rounded-full border border-[var(--hx-surface)] bg-[var(--hx-accent)] px-2 text-xs font-extrabold text-white shadow'>
+            {Number(props.badgeCount)}
+          </div>
+        ) : null}
       </div>
 
       <p className='px-1 pt-1 text-lg font-bold leading-6 text-[var(--hx-text)]'>
