@@ -9,18 +9,20 @@ const Home = () => {
   const currentUser = useMemo(() => getCurrentMockUser(), [])
   const userFriends = useMemo(() => getFriendsForUser(currentUser), [currentUser])
 
-  const [topCircles, setTopCircles] = useState(() => userFriends.slice(0, 6))
-  const [rightCircles, setRightCircles] = useState(() => userFriends.slice(6, 36))
-  const [badgeCircles, setBadgeCircles] = useState([])
+  const [circleState, setCircleState] = useState(() => ({
+    top: userFriends.slice(0, 6),
+    right: userFriends.slice(6, 36),
+    badge: [],
+  }))
   const [isFriendsLoading, setIsFriendsLoading] = useState(true)
   const [selectedUser, setSelectedUser] = useState(null)
   const [isUserModalOpen, setIsUserModalOpen] = useState(false)
 
   const activePostImg = useMemo(() => {
-    if (badgeCircles.length === 0) return null
-    const last = badgeCircles[badgeCircles.length - 1]
+    if (circleState.badge.length === 0) return null
+    const last = circleState.badge[circleState.badge.length - 1]
     return last?.avatar ?? null
-  }, [badgeCircles])
+  }, [circleState.badge])
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -30,60 +32,65 @@ const Home = () => {
     return () => clearTimeout(timeoutId)
   }, [])
 
-  const handleRightScrollDown = useCallback(() => {
+  const handleRightScrollDown = useCallback((count = 1) => {
     if (isFriendsLoading) {
       return
     }
 
-    setRightCircles((currentRight) => {
-      if (currentRight.length <= 10) {
-        return currentRight
-      }
+    const cycles = Number.isFinite(Number(count)) ? Math.max(1, Math.floor(Number(count))) : 1
+    setCircleState((prev) => {
+      let top = prev.top
+      let right = prev.right
+      let badge = prev.badge
 
-      if (currentRight.length === 0) {
-        return currentRight
-      }
+      // Copy only once for the entire gesture batch.
+      top = [...top]
+      right = [...right]
+      badge = [...badge]
 
-      const [movedFromRight, ...remainingRight] = currentRight
+      for (let i = 0; i < cycles; i += 1) {
+        if (right.length <= 10 || right.length === 0) break
+        const movedFromRight = right.shift()
+        if (!movedFromRight) break
 
-      setTopCircles((currentTop) => {
-        if (currentTop.length === 0) {
-          return [movedFromRight]
+        if (top.length === 0) {
+          top.push(movedFromRight)
+          continue
         }
 
-        const [movedFromTop, ...remainingTop] = currentTop
-        setBadgeCircles((currentBadge) => [...currentBadge, movedFromTop])
-        return [...remainingTop, movedFromRight]
-      })
+        const movedFromTop = top.shift()
+        if (movedFromTop) badge.push(movedFromTop)
+        top.push(movedFromRight)
+      }
 
-      return remainingRight
+      return { top, right, badge }
     })
   }, [isFriendsLoading])
 
-  const handleRightScrollUp = useCallback(() => {
+  const handleRightScrollUp = useCallback((count = 1) => {
     if (isFriendsLoading) {
       return
     }
 
-    setBadgeCircles((currentBadge) => {
-      if (currentBadge.length === 0) {
-        return currentBadge
+    const cycles = Number.isFinite(Number(count)) ? Math.max(1, Math.floor(Number(count))) : 1
+    setCircleState((prev) => {
+      let top = prev.top
+      let right = prev.right
+      let badge = prev.badge
+
+      top = [...top]
+      right = [...right]
+      badge = [...badge]
+
+      for (let i = 0; i < cycles; i += 1) {
+        if (badge.length === 0 || top.length === 0) break
+        const restoredBadge = badge.pop()
+        const restoredFromTop = top.pop()
+        if (restoredFromTop) right.unshift(restoredFromTop)
+        if (restoredBadge) top.unshift(restoredBadge)
       }
 
-      const restoredBadge = currentBadge[currentBadge.length - 1]
-
-      setTopCircles((currentTop) => {
-        if (currentTop.length === 0) {
-          return currentTop
-        }
-
-        const restoredFromTop = currentTop[currentTop.length - 1]
-        const remainingTop = currentTop.slice(0, -1)
-        setRightCircles((currentRight) => [restoredFromTop, ...currentRight])
-        return [restoredBadge, ...remainingTop]
-      })
-
-      return currentBadge.slice(0, -1)
+      return { top, right, badge }
     })
   }, [isFriendsLoading])
 
@@ -93,12 +100,12 @@ const Home = () => {
         <FeedProvider
           value={{
             activePostImg,
-            activePostBadgeCount: badgeCircles.length,
+            activePostBadgeCount: circleState.badge.length,
           }}
         >
           <Top
-            topCircles={topCircles}
-            badgeCount={badgeCircles.length}
+            topCircles={circleState.top}
+            badgeCount={circleState.badge.length}
             isLoading={isFriendsLoading}
             onCircleClick={(friend) => {
               setSelectedUser(friend)
@@ -106,12 +113,12 @@ const Home = () => {
             }}
           />
           <Bottom
-            rightCircles={rightCircles}
+            rightCircles={circleState.right}
             onRightScrollDown={handleRightScrollDown}
             onRightScrollUp={handleRightScrollUp}
             isLoading={isFriendsLoading}
             activePostImg={activePostImg}
-            activePostBadgeCount={badgeCircles.length}
+            activePostBadgeCount={circleState.badge.length}
             onRightCircleClick={(friend) => {
               setSelectedUser(friend)
               setIsUserModalOpen(true)

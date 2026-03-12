@@ -20,13 +20,11 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
       return
     }
 
-    for (let i = 0; i < count; i += 1) {
-      if (direction === 'down' && onScrollDown) {
-        onScrollDown()
-      }
-      if (direction === 'up' && onScrollUp) {
-        onScrollUp()
-      }
+    if (direction === 'down' && onScrollDown) {
+      onScrollDown(count)
+    }
+    if (direction === 'up' && onScrollUp) {
+      onScrollUp(count)
     }
   }
 
