@@ -9,6 +9,7 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
   const startPointerYRef = useRef(null)
   const isDraggingRef = useRef(false)
   const dragHappenedRef = useRef(false)
+  const lastPointerEventTsRef = useRef(0)
 
   const STEP_PX = 36
   const MAX_CYCLES_PER_EVENT = 6
@@ -59,6 +60,7 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
   }
 
   const handlePointerDown = (event) => {
+    lastPointerEventTsRef.current = Date.now()
     pointerDownRef.current = true
     lastPointerYRef.current = event.clientY
     startPointerYRef.current = event.clientY
@@ -71,6 +73,8 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
     if (!pointerDownRef.current || typeof lastPointerYRef.current !== 'number') {
       return
     }
+
+    lastPointerEventTsRef.current = Date.now()
 
     const currentY = event.clientY
     const startY = startPointerYRef.current
@@ -104,6 +108,66 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
     // If there was a drag, keep this true until the click-capture sees it.
   }
 
+  const getTouchY = (event) => {
+    const touch = event.touches?.[0] || event.changedTouches?.[0]
+    return touch ? touch.clientY : null
+  }
+
+  const handleTouchStart = (event) => {
+    // Some browsers fire both pointer and touch events for the same gesture.
+    // If pointer events are already flowing, ignore touch to avoid double-cycling.
+    if (Date.now() - lastPointerEventTsRef.current < 800) {
+      return
+    }
+
+    const y = getTouchY(event)
+    if (typeof y !== 'number') {
+      return
+    }
+
+    pointerDownRef.current = true
+    lastPointerYRef.current = y
+    startPointerYRef.current = y
+    isDraggingRef.current = false
+    dragHappenedRef.current = false
+    accumulatedDeltaRef.current = 0
+  }
+
+  const handleTouchMove = (event) => {
+    if (Date.now() - lastPointerEventTsRef.current < 800) {
+      return
+    }
+
+    if (!pointerDownRef.current || typeof lastPointerYRef.current !== 'number') {
+      return
+    }
+
+    const currentY = getTouchY(event)
+    if (typeof currentY !== 'number') {
+      return
+    }
+
+    const startY = startPointerYRef.current
+    if (!isDraggingRef.current && typeof startY === 'number') {
+      const totalDelta = startY - currentY
+      if (Math.abs(totalDelta) >= DRAG_START_PX) {
+        isDraggingRef.current = true
+        dragHappenedRef.current = true
+      }
+    }
+
+    if (isDraggingRef.current) {
+      const deltaY = lastPointerYRef.current - currentY
+      processDelta(deltaY)
+    }
+
+    lastPointerYRef.current = currentY
+  }
+
+  const handleTouchEndOrCancel = () => {
+    handlePointerUpOrCancel()
+  }
+
   return (
     <aside
       className='no-scrollbar h-full w-[58px] touch-none overflow-hidden bg-[var(--hx-surface-2)] py-1 select-none'
@@ -112,6 +176,10 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUpOrCancel}
       onPointerCancel={handlePointerUpOrCancel}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEndOrCancel}
+      onTouchCancel={handleTouchEndOrCancel}
       onClickCapture={(event) => {
         // If the gesture turned into a drag, suppress avatar click/modal.
         if (dragHappenedRef.current) {
