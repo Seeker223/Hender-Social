@@ -22,7 +22,7 @@ const Home = () => {
   const activePostImg = useMemo(() => {
     if (circleState.badge.length === 0) return null
     const last = circleState.badge[circleState.badge.length - 1]
-    return last?.avatar ?? null
+    return last?.avatarFull ?? last?.avatar ?? null
   }, [circleState.badge])
 
   useEffect(() => {

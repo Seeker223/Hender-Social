@@ -33,7 +33,7 @@ const UserModal = ({ isOpen, user, onClose }) => {
         <div className='flex items-start justify-between gap-3'>
           <div className='flex items-center gap-3'>
             <img
-              src={user.avatar}
+              src={user.avatarFull || user.avatar}
               alt={user.name}
               className='h-14 w-14 rounded-full border-2 border-[#ff2c7b] object-cover'
               loading='lazy'

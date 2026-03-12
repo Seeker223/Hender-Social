@@ -1,25 +1,66 @@
-import m1 from '../assets/male/p1.jpg'
-import m2 from '../assets/male/p2.jpg'
-import m3 from '../assets/male/p3.jpg'
-import m4 from '../assets/male/p4.jpg'
-import m5 from '../assets/male/p5.jpg'
-import m6 from '../assets/male/p6.jpg'
-import m8 from '../assets/male/p8.jpg'
-import m9 from '../assets/male/p9.jpg'
-import f1 from '../assets/female/1.jpg'
-import f2 from '../assets/female/2.jpg'
-import f3 from '../assets/female/3.jpg'
-import f4 from '../assets/female/4.jpg'
-import f5 from '../assets/female/5.jpg'
-import f6 from '../assets/female/6.jpg'
-import f7 from '../assets/female/7.jpg'
-import f9 from '../assets/female/9.jpg'
-import f10 from '../assets/female/10.jpg'
-import f11 from '../assets/female/11.jpg'
-import f12 from '../assets/female/12.jpg'
+import m1Full from '../assets/male/p1.jpg'
+import m2Full from '../assets/male/p2.jpg'
+import m3Full from '../assets/male/p3.jpg'
+import m4Full from '../assets/male/p4.jpg'
+import m5Full from '../assets/male/p5.jpg'
+import m6Full from '../assets/male/p6.jpg'
+import m8Full from '../assets/male/p8.jpg'
+import m9Full from '../assets/male/p9.jpg'
+import f1Full from '../assets/female/1.jpg'
+import f2Full from '../assets/female/2.jpg'
+import f3Full from '../assets/female/3.jpg'
+import f4Full from '../assets/female/4.jpg'
+import f5Full from '../assets/female/5.jpg'
+import f6Full from '../assets/female/6.jpg'
+import f7Full from '../assets/female/7.jpg'
+import f9Full from '../assets/female/9.jpg'
+import f10Full from '../assets/female/10.jpg'
+import f11Full from '../assets/female/11.jpg'
+import f12Full from '../assets/female/12.jpg'
 
-// All images in this pool are already < 500KB on disk in this repo.
-const AVATAR_POOL = [m1, f1, m2, f2, m3, f3, m4, f4, m5, f5, m6, f6, m8, f7, m9, f9, f10, f11, f12]
+import m1Thumb from '../assets/thumbs/male/p1.webp'
+import m2Thumb from '../assets/thumbs/male/p2.webp'
+import m3Thumb from '../assets/thumbs/male/p3.webp'
+import m4Thumb from '../assets/thumbs/male/p4.webp'
+import m5Thumb from '../assets/thumbs/male/p5.webp'
+import m6Thumb from '../assets/thumbs/male/p6.webp'
+import m8Thumb from '../assets/thumbs/male/p8.webp'
+import m9Thumb from '../assets/thumbs/male/p9.webp'
+import f1Thumb from '../assets/thumbs/female/1.webp'
+import f2Thumb from '../assets/thumbs/female/2.webp'
+import f3Thumb from '../assets/thumbs/female/3.webp'
+import f4Thumb from '../assets/thumbs/female/4.webp'
+import f5Thumb from '../assets/thumbs/female/5.webp'
+import f6Thumb from '../assets/thumbs/female/6.webp'
+import f7Thumb from '../assets/thumbs/female/7.webp'
+import f9Thumb from '../assets/thumbs/female/9.webp'
+import f10Thumb from '../assets/thumbs/female/10.webp'
+import f11Thumb from '../assets/thumbs/female/11.webp'
+import f12Thumb from '../assets/thumbs/female/12.webp'
+
+// Full images in this pool are already < 500KB on disk in this repo.
+// Thumbs are ~1-3KB WebP for fast offrolling on mobile.
+const AVATAR_POOL = [
+  { full: m1Full, thumb: m1Thumb },
+  { full: f1Full, thumb: f1Thumb },
+  { full: m2Full, thumb: m2Thumb },
+  { full: f2Full, thumb: f2Thumb },
+  { full: m3Full, thumb: m3Thumb },
+  { full: f3Full, thumb: f3Thumb },
+  { full: m4Full, thumb: m4Thumb },
+  { full: f4Full, thumb: f4Thumb },
+  { full: m5Full, thumb: m5Thumb },
+  { full: f5Full, thumb: f5Thumb },
+  { full: m6Full, thumb: m6Thumb },
+  { full: f6Full, thumb: f6Thumb },
+  { full: m8Full, thumb: m8Thumb },
+  { full: f7Full, thumb: f7Thumb },
+  { full: m9Full, thumb: m9Thumb },
+  { full: f9Full, thumb: f9Thumb },
+  { full: f10Full, thumb: f10Thumb },
+  { full: f11Full, thumb: f11Thumb },
+  { full: f12Full, thumb: f12Thumb },
+]
 
 const MOCK_USERS_KEY = 'hender_mock_users'
 const MOCK_SESSION_KEY = 'hender_mock_session'
@@ -48,8 +89,9 @@ const FRIEND_NAMES = [
 export const MOCK_FRIENDS = Array.from({ length: 48 }, (_, index) => {
   const id = `f${index + 1}`
   const name = FRIEND_NAMES[index] || `Friend ${index + 1}`
-  const avatar = AVATAR_POOL[index % AVATAR_POOL.length]
-  return { id, name, avatar }
+  const { full, thumb } = AVATAR_POOL[index % AVATAR_POOL.length]
+  // `avatar` is used by circle UI (Top/Right) so it stays lightweight.
+  return { id, name, avatar: thumb, avatarFull: full }
 })
 
 const DEFAULT_USERS = [
