@@ -116,10 +116,21 @@ const Message = () => {
   const [threads, setThreads] = useState([])
   const [thread, setThread] = useState(null)
   const [isRecording, setIsRecording] = useState(false)
+  const [recordSeconds, setRecordSeconds] = useState(0)
   const [recordError, setRecordError] = useState('')
 
   const scrollRef = useRef(null)
   const recRef = useRef({ stream: null, recorder: null, chunks: [] })
+  const recordStartRef = useRef(0)
+
+  useEffect(() => {
+    if (!isRecording) return undefined
+    const id = window.setInterval(() => {
+      const elapsed = Math.max(0, Math.floor((Date.now() - recordStartRef.current) / 1000))
+      setRecordSeconds(elapsed)
+    }, 250)
+    return () => window.clearInterval(id)
+  }, [isRecording])
 
   useEffect(() => {
     ensureSeededThreads(friends)
@@ -202,6 +213,8 @@ const Message = () => {
     }
     recRef.current.stream = null
     recRef.current.recorder = null
+    // If onstop doesn't fire for some reason, ensure UI unblocks.
+    setIsRecording(false)
   }
 
   const startRecording = async () => {
@@ -259,6 +272,8 @@ const Message = () => {
         }
       }
 
+      recordStartRef.current = Date.now()
+      setRecordSeconds(0)
       recorder.start(250)
       setIsRecording(true)
     } catch {
@@ -337,7 +352,11 @@ const Message = () => {
                       </p>
                     </div>
                     <p className='mt-1 truncate text-xs text-[var(--hx-text-muted)]'>
-                      {t.last ? `${t.last.from === 'me' ? `${meName}: ` : ''}${t.last.text}` : 'Tap to start chatting'}
+                      {t.last
+                        ? `${t.last.from === 'me' ? `${meName}: ` : ''}${
+                            t.last.audioSrc ? '🎙 Voice message' : t.last.text || 'Message'
+                          }`
+                        : 'Tap to start chatting'}
                     </p>
                   </div>
                 </button>
@@ -377,6 +396,12 @@ const Message = () => {
             </p>
           </div>
         </div>
+        {isRecording ? (
+          <div className='flex items-center gap-2 rounded-full border border-[rgba(228,0,110,0.35)] bg-[var(--hx-accent-bg)] px-3 py-1 text-[10px] font-extrabold text-[var(--hx-text)]'>
+            <span className='h-2 w-2 animate-pulse rounded-full bg-[var(--hx-accent)]' />
+            REC {Math.floor(recordSeconds / 60)}:{String(recordSeconds % 60).padStart(2, '0')}
+          </div>
+        ) : null}
       </header>
 
       <div ref={scrollRef} className='no-scrollbar flex-1 overflow-y-auto p-2'>
@@ -393,7 +418,7 @@ const Message = () => {
                   }`}
                 >
                   {m.audioSrc ? (
-                    <audio controls src={m.audioSrc} className='w-full' />
+                    <audio controls src={m.audioSrc} className='w-full max-w-[240px]' />
                   ) : null}
                   {m.text ? <p className='whitespace-pre-wrap break-words'>{m.text}</p> : null}
                   <p className='mt-1 text-[10px] font-semibold text-[var(--hx-text-muted)]'>
@@ -409,10 +434,27 @@ const Message = () => {
       <div className='sticky bottom-0 z-30 border-t border-[var(--hx-border)] bg-[var(--hx-surface)] p-2'>
         <div className='mx-auto flex w-full max-w-[360px] items-end gap-2'>
           <div className='flex-1 rounded-2xl border border-[var(--hx-border)] bg-[var(--hx-surface-2)] p-2'>
+            {isRecording ? (
+              <div className='mb-2 flex items-center justify-between gap-2 rounded-xl border border-[rgba(228,0,110,0.35)] bg-[var(--hx-accent-bg)] px-3 py-2'>
+                <div className='flex items-center gap-2'>
+                  <span className='h-2.5 w-2.5 animate-pulse rounded-full bg-[var(--hx-accent)]' />
+                  <p className='text-xs font-extrabold text-[var(--hx-text)]'>Recording</p>
+                  <p className='text-xs font-semibold text-[var(--hx-text-muted)]'>
+                    {Math.floor(recordSeconds / 60)}:{String(recordSeconds % 60).padStart(2, '0')}
+                  </p>
+                </div>
+                <div className='flex items-end gap-1'>
+                  <span className='h-2 w-1 animate-pulse rounded bg-[var(--hx-accent)]' />
+                  <span className='h-3 w-1 animate-pulse rounded bg-[var(--hx-accent)] [animation-delay:120ms]' />
+                  <span className='h-2.5 w-1 animate-pulse rounded bg-[var(--hx-accent)] [animation-delay:220ms]' />
+                </div>
+              </div>
+            ) : null}
             <textarea
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder='Message...'
+              disabled={isRecording}
               rows={1}
               className='no-scrollbar max-h-28 w-full resize-none bg-transparent text-sm text-[var(--hx-text)] outline-none placeholder:text-[var(--hx-text-muted)]'
               onKeyDown={(e) => {
@@ -431,8 +473,8 @@ const Message = () => {
                 }
               }}
             />
-            <div className='mt-1 flex items-center justify-between'>
-              <div className='flex items-center gap-1'>
+            <div className='mt-1 flex items-center justify-between gap-2'>
+              <div className='no-scrollbar flex min-w-0 flex-1 items-center gap-1 overflow-x-auto pr-2'>
                 {[
                   ...NAIRALAND_GREEN_EMOJIS.slice(0, 3),
                   ...NAIRALAND_GREEN_FACE_EMOJIS.slice(0, 2),
@@ -445,7 +487,8 @@ const Message = () => {
                   <button
                     key={e}
                     type='button'
-                    className='grid h-8 w-8 place-items-center rounded-full hover:bg-[var(--hx-surface)]'
+                    className='grid h-8 w-8 shrink-0 place-items-center rounded-full hover:bg-[var(--hx-surface)] disabled:opacity-50'
+                    disabled={isRecording}
                     onClick={() => {
                       setDraft((d) => `${d}${e}`)
                       emitEmojiCircle(e)
@@ -455,7 +498,7 @@ const Message = () => {
                   </button>
                 ))}
               </div>
-              <p className='text-[10px] font-semibold text-[var(--hx-text-muted)]'>
+              <p className='hidden shrink-0 text-[10px] font-semibold text-[var(--hx-text-muted)] sm:block'>
                 Enter to send, Shift+Enter new line
               </p>
             </div>
@@ -484,7 +527,7 @@ const Message = () => {
           <button
             type='button'
             aria-label='Send'
-            disabled={!draft.trim()}
+            disabled={!draft.trim() || isRecording}
             onClick={() => {
               const msg = sendMessage(activeFriend.id, draft)
               if (!msg) return
