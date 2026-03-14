@@ -26,9 +26,17 @@ export const getPostComments = (postId) => {
   return Array.isArray(list) ? list : []
 }
 
-export const addPostComment = ({ postId, text, authorId = 'me', authorName = 'You', parentId = '' }) => {
+export const addPostComment = ({
+  postId,
+  text,
+  audioSrc = '',
+  authorId = 'me',
+  authorName = 'You',
+  parentId = '',
+}) => {
   const trimmed = String(text || '').trim()
-  if (!postId || !trimmed) return null
+  const audio = String(audioSrc || '').trim()
+  if (!postId || (!trimmed && !audio)) return null
 
   const all = readAll()
   const next = Array.isArray(all[postId]) ? [...all[postId]] : []
@@ -36,6 +44,7 @@ export const addPostComment = ({ postId, text, authorId = 'me', authorName = 'Yo
     id: `${postId}-lc${Date.now()}`,
     postId,
     text: trimmed,
+    audioSrc: audio,
     authorId,
     authorName,
     parentId: parentId || '',
@@ -46,4 +55,3 @@ export const addPostComment = ({ postId, text, authorId = 'me', authorName = 'Yo
   writeAll(all)
   return comment
 }
-

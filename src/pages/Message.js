@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import Circle from '../components/Circle'
 import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
-import { ensureSeededThreads, getThread, listThreads, markRead, receiveMockReply, sendMessage } from '../mock/chatMock'
+import { ensureSeededThreads, getThread, listThreads, markRead, receiveMockReply, sendAudioMessage, sendMessage } from '../mock/chatMock'
 import { emojiToDataUrl } from '../utils/emojiThumb'
 import { NAIRALAND_GREEN_EMOJIS, NAIRALAND_GREEN_FACE_EMOJIS } from '../utils/emojiSets'
 
@@ -68,6 +68,30 @@ const SendIcon = () => (
   </Svg>
 )
 
+const MicIcon = () => (
+  <Svg>
+    <path
+      d='M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+    <path
+      d='M19 11a7 7 0 0 1-14 0'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+    />
+    <path
+      d='M12 18v3'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+    />
+  </Svg>
+)
+
 const formatTime = (iso) => {
   try {
     const dt = new Date(iso)
@@ -91,8 +115,11 @@ const Message = () => {
   const [threadTick, setThreadTick] = useState(0)
   const [threads, setThreads] = useState([])
   const [thread, setThread] = useState(null)
+  const [isRecording, setIsRecording] = useState(false)
+  const [recordError, setRecordError] = useState('')
 
   const scrollRef = useRef(null)
+  const recRef = useRef({ stream: null, recorder: null, chunks: [] })
 
   useEffect(() => {
     ensureSeededThreads(friends)
@@ -155,6 +182,90 @@ const Message = () => {
     }
     window.localStorage.setItem('hender_last_emoji_circle', JSON.stringify(circle))
     window.dispatchEvent(new CustomEvent('hender:emoji-circle', { detail: circle }))
+  }
+
+  const blobToDataUrl = (blob) =>
+    new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onloadend = () => resolve(String(reader.result || ''))
+      reader.onerror = () => resolve('')
+      reader.readAsDataURL(blob)
+    })
+
+  const stopRecording = async () => {
+    const { recorder, stream } = recRef.current
+    if (recorder && recorder.state !== 'inactive') {
+      recorder.stop()
+    }
+    if (stream) {
+      stream.getTracks().forEach((t) => t.stop())
+    }
+    recRef.current.stream = null
+    recRef.current.recorder = null
+  }
+
+  const startRecording = async () => {
+    setRecordError('')
+    if (typeof window === 'undefined') return
+    if (!navigator?.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      setRecordError('Voice recording is not supported on this device/browser.')
+      return
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream)
+      recRef.current = { stream, recorder, chunks: [] }
+
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size) recRef.current.chunks.push(e.data)
+      }
+
+      recorder.onstop = async () => {
+        setIsRecording(false)
+        const chunks = recRef.current.chunks || []
+        const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' })
+        const dataUrl = await blobToDataUrl(blob)
+        if (!dataUrl) return
+
+        // Guard localStorage: keep voice clips reasonably small.
+        if (dataUrl.length > 2_500_000) {
+          setRecordError('Voice clip too large. Record a shorter message.')
+          return
+        }
+
+        const msg = sendAudioMessage(activeFriend.id, dataUrl)
+        if (!msg) return
+        setThreadTick((t) => t + 1)
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('hender:activity-circle', {
+              detail: {
+                id: `chat-${activeFriend.id}-${Date.now()}`,
+                name: 'Chat',
+                avatar: activeFriend.avatar,
+                avatarFull: activeFriend.avatarFull || activeFriend.avatar,
+                badgeIcon: 'chat',
+                activityType: 'chat',
+                friendId: activeFriend.id,
+                createdAt: new Date().toISOString(),
+                actorName: meName,
+                friendName: activeFriend.name || '',
+                messageText: '[Voice message]',
+                messageAudioSrc: dataUrl,
+              },
+            })
+          )
+        }
+      }
+
+      recorder.start(250)
+      setIsRecording(true)
+    } catch {
+      setRecordError('Microphone permission denied or unavailable.')
+      setIsRecording(false)
+      await stopRecording()
+    }
   }
 
   if (!activeFriend) {
@@ -281,7 +392,10 @@ const Message = () => {
                       : 'border-[var(--hx-border)] bg-[var(--hx-surface)] text-[var(--hx-text)]'
                   }`}
                 >
-                  <p className='whitespace-pre-wrap break-words'>{m.text}</p>
+                  {m.audioSrc ? (
+                    <audio controls src={m.audioSrc} className='w-full' />
+                  ) : null}
+                  {m.text ? <p className='whitespace-pre-wrap break-words'>{m.text}</p> : null}
                   <p className='mt-1 text-[10px] font-semibold text-[var(--hx-text-muted)]'>
                     {formatTime(m.createdAt)}
                   </p>
@@ -349,6 +463,26 @@ const Message = () => {
 
           <button
             type='button'
+            aria-label={isRecording ? 'Stop recording' : 'Record voice'}
+            onClick={async () => {
+              if (!activeFriend) return
+              if (isRecording) {
+                await stopRecording()
+              } else {
+                await startRecording()
+              }
+            }}
+            className={`grid h-11 w-11 place-items-center rounded-full border ${
+              isRecording
+                ? 'border-[rgba(228,0,110,0.35)] bg-[rgba(228,0,110,0.9)] text-white'
+                : 'border-[var(--hx-border)] bg-[var(--hx-surface)] text-[var(--hx-text)] hover:bg-[var(--hx-surface-2)]'
+            }`}
+          >
+            <MicIcon />
+          </button>
+
+          <button
+            type='button'
             aria-label='Send'
             disabled={!draft.trim()}
             onClick={() => {
@@ -387,6 +521,11 @@ const Message = () => {
             <SendIcon />
           </button>
         </div>
+        {recordError ? (
+          <p className='mx-auto mt-2 w-full max-w-[360px] text-xs font-semibold text-[var(--hx-text-muted)]'>
+            {recordError}
+          </p>
+        ) : null}
       </div>
     </section>
   )

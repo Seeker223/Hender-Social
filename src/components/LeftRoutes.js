@@ -71,6 +71,7 @@ const LeftRoutes = ({ isLoading = false, activePostImg = null, activePostBadgeCo
           name={post.authorName}
           img={post.authorAvatar}
           postImg={post.postImg}
+          media={post.media}
           badgeCount={post.badgeCount}
           text={post.text}
           html={post.html}

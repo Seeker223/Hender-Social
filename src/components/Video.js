@@ -4,6 +4,7 @@ import river from '../assets/river.mp4'
 import yviyc0jsucjgy98gjthy from '../assets/yviyc0jsucjgy98gjthy.mp4'
 import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
 import { createSquareThumbDataUrlFromVideoSrc } from '../utils/thumbs'
+import { addStoredVideo, getStoredVideos } from '../mock/videosMock'
 
 const Svg = ({ children }) => (
   <svg
@@ -115,10 +116,20 @@ const clamp01 = (n) => Math.max(0, Math.min(1, n))
 const Video = () => {
   const currentUser = useMemo(() => getCurrentMockUser(), [])
   const friends = useMemo(() => getFriendsForUser(currentUser), [currentUser])
+  const [userVideos, setUserVideos] = useState([])
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [newCaption, setNewCaption] = useState('')
+  const [newVideoSrc, setNewVideoSrc] = useState('')
+  const [isUploading, setIsUploading] = useState(false)
+  const [createError, setCreateError] = useState('')
+
+  useEffect(() => {
+    setUserVideos(getStoredVideos())
+  }, [])
 
   const items = useMemo(() => {
     const fallbackAvatar = friends?.[0]?.avatarFull || friends?.[0]?.avatar
-    return [
+    const seeded = [
       {
         id: 'v1',
         src: parrots,
@@ -144,7 +155,18 @@ const Video = () => {
         tags: ['hender', 'reels'],
       },
     ]
-  }, [friends])
+
+    const stored = (userVideos || []).map((v) => ({
+      id: v.id,
+      src: v.src,
+      authorName: v.authorName || currentUser?.name || 'You',
+      authorAvatar: v.authorAvatar || fallbackAvatar,
+      caption: v.caption || '',
+      tags: Array.isArray(v.tags) ? v.tags : ['upload'],
+    }))
+
+    return [...stored, ...seeded]
+  }, [currentUser?.name, friends, userVideos])
 
   const wrapRef = useRef(null)
   const videoRefs = useRef(new Map())
@@ -224,15 +246,29 @@ const Video = () => {
           <p className='text-sm font-extrabold text-[var(--hx-text)]'>Reels</p>
           <p className='text-xs text-[var(--hx-text-muted)]'>Autoplays in view. Tap to pause.</p>
         </div>
-        <button
-          type='button'
-          aria-label={muted ? 'Unmute' : 'Mute'}
-          onClick={() => setMuted((v) => !v)}
-          className='flex items-center gap-2 rounded-full border border-[var(--hx-border)] bg-[var(--hx-surface-glass)] px-3 py-2 text-xs font-bold text-[var(--hx-text)] supports-[backdrop-filter]:backdrop-blur-md'
-        >
-          {muted ? <VolumeOffIcon /> : <VolumeOnIcon />}
-          {muted ? 'Muted' : 'Sound'}
-        </button>
+        <div className='flex items-center gap-2'>
+          <button
+            type='button'
+            onClick={() => {
+              setCreateError('')
+              setNewCaption('')
+              setNewVideoSrc('')
+              setIsCreateOpen(true)
+            }}
+            className='rounded-full bg-[var(--hx-accent)] px-4 py-2 text-xs font-extrabold text-white'
+          >
+            Create
+          </button>
+          <button
+            type='button'
+            aria-label={muted ? 'Unmute' : 'Mute'}
+            onClick={() => setMuted((v) => !v)}
+            className='flex items-center gap-2 rounded-full border border-[var(--hx-border)] bg-[var(--hx-surface-glass)] px-3 py-2 text-xs font-bold text-[var(--hx-text)] supports-[backdrop-filter]:backdrop-blur-md'
+          >
+            {muted ? <VolumeOffIcon /> : <VolumeOnIcon />}
+            {muted ? 'Muted' : 'Sound'}
+          </button>
+        </div>
       </div>
 
       <div className='space-y-3'>
@@ -416,6 +452,154 @@ const Video = () => {
           )
         })}
       </div>
+
+      {isCreateOpen ? (
+        <div
+          className='fixed inset-0 z-[1200] flex items-end justify-center bg-black/55 p-3'
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setIsCreateOpen(false)
+          }}
+        >
+          <div className='w-full max-w-[420px] overflow-hidden rounded-3xl border border-[var(--hx-border)] bg-[var(--hx-surface)] text-[var(--hx-text)] shadow-2xl'>
+            <div className='flex items-center justify-between border-b border-[var(--hx-border)] bg-[var(--hx-surface-glass)] p-4 supports-[backdrop-filter]:backdrop-blur-md'>
+              <p className='text-sm font-extrabold'>Create Video</p>
+              <button
+                type='button'
+                onClick={() => setIsCreateOpen(false)}
+                className='rounded-full border border-[var(--hx-border)] bg-[var(--hx-surface)] px-3 py-1 text-xs font-bold hover:bg-[var(--hx-surface-2)]'
+              >
+                Close
+              </button>
+            </div>
+
+            <div className='p-4'>
+              <input
+                type='file'
+                accept='video/*'
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  e.target.value = ''
+                  if (!file) return
+                  setCreateError('')
+                  // localStorage is small (~5MB). Keep videos very small in this mock flow.
+                  if (file.size > 3 * 1024 * 1024) {
+                    setCreateError('Video too large for mock storage. Choose a smaller clip (<= 3MB).')
+                    return
+                  }
+                  setIsUploading(true)
+                  try {
+                    const dataUrl = await new Promise((resolve) => {
+                      const reader = new FileReader()
+                      reader.onloadend = () => resolve(String(reader.result || ''))
+                      reader.onerror = () => resolve('')
+                      reader.readAsDataURL(file)
+                    })
+                    if (!dataUrl) {
+                      setCreateError('Could not read this video.')
+                      return
+                    }
+                    setNewVideoSrc(dataUrl)
+                  } finally {
+                    setIsUploading(false)
+                  }
+                }}
+                className='w-full text-xs'
+              />
+
+              <div className='mt-3'>
+                <input
+                  value={newCaption}
+                  onChange={(e) => setNewCaption(e.target.value)}
+                  placeholder='Write a caption...'
+                  className='h-10 w-full rounded-full border border-[var(--hx-border)] bg-[var(--hx-surface-2)] px-4 text-sm outline-none placeholder:text-[var(--hx-text-muted)] focus:border-[var(--hx-accent)]'
+                />
+              </div>
+
+              {createError ? (
+                <p className='mt-2 text-xs font-semibold text-[var(--hx-text-muted)]'>{createError}</p>
+              ) : null}
+
+              {newVideoSrc ? (
+                <div className='mt-3 overflow-hidden rounded-2xl border border-[var(--hx-border)] bg-black'>
+                  <video
+                    src={newVideoSrc}
+                    className='h-56 w-full object-cover'
+                    controls
+                    playsInline
+                    preload='metadata'
+                  />
+                </div>
+              ) : (
+                <div className='mt-3 grid h-56 place-items-center rounded-2xl border border-[var(--hx-border)] bg-[var(--hx-surface-2)] text-xs text-[var(--hx-text-muted)]'>
+                  {isUploading ? 'Loading video...' : 'Choose a video to preview.'}
+                </div>
+              )}
+
+              <button
+                type='button'
+                disabled={!newVideoSrc || isUploading}
+                onClick={async () => {
+                  if (!newVideoSrc) return
+                  setIsUploading(true)
+                  setCreateError('')
+                  try {
+                    const id = `uv-${Date.now()}`
+                    const fallbackAvatar = friends?.[0]?.avatarFull || friends?.[0]?.avatar || ''
+                    const authorAvatar = currentUser?.avatarFull || currentUser?.avatar || fallbackAvatar
+                    const vid = addStoredVideo({
+                      id,
+                      src: newVideoSrc,
+                      caption: newCaption.trim(),
+                      tags: ['upload'],
+                      authorName: currentUser?.name || 'You',
+                      authorAvatar,
+                      createdAt: new Date().toISOString(),
+                    })
+                    setUserVideos(getStoredVideos())
+
+                    if (typeof window !== 'undefined') {
+                      ;(async () => {
+                        try {
+                          const thumb = await createSquareThumbDataUrlFromVideoSrc({ src: newVideoSrc })
+                          window.dispatchEvent(
+                            new CustomEvent('hender:activity-circle', {
+                              detail: {
+                                id: `video-${vid.id}-${Date.now()}`,
+                                name: 'Video',
+                                avatar: thumb || authorAvatar,
+                                avatarFull: thumb || authorAvatar,
+                                badgeIcon: 'video',
+                                activityType: 'video',
+                                videoId: vid.id,
+                                createdAt: new Date().toISOString(),
+                                actorName: currentUser?.name || 'You',
+                                authorName: currentUser?.name || 'You',
+                                caption: vid.caption || '',
+                                videoSrc: newVideoSrc,
+                              },
+                            })
+                          )
+                        } catch {
+                          // ignore
+                        }
+                      })()
+                    }
+
+                    setIsCreateOpen(false)
+                  } catch {
+                    setCreateError('Could not save this video. Try a smaller clip.')
+                  } finally {
+                    setIsUploading(false)
+                  }
+                }}
+                className='mt-4 w-full rounded-full bg-[var(--hx-accent)] px-4 py-3 text-sm font-extrabold text-white disabled:opacity-60'
+              >
+                Post Video
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   )
 }

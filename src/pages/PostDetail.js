@@ -50,6 +50,30 @@ const SendIcon = () => (
   </Svg>
 )
 
+const MicIcon = () => (
+  <Svg>
+    <path
+      d='M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+    <path
+      d='M19 11a7 7 0 0 1-14 0'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+    />
+    <path
+      d='M12 18v3'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+    />
+  </Svg>
+)
+
 const HeartIcon = ({ active }) => (
   <Svg>
     <path
@@ -104,6 +128,11 @@ const formatShortTime = (iso) => {
   }
 }
 
+const isVideoSrc = (src) => {
+  const s = String(src || '')
+  return s.startsWith('data:video/') || s.endsWith('.mp4') || s.endsWith('.webm')
+}
+
 const PostDetail = () => {
   const navigate = useNavigate()
   const { postId } = useParams()
@@ -116,6 +145,10 @@ const PostDetail = () => {
   const [comments, setComments] = useState([])
   const [replyDrafts, setReplyDrafts] = useState({})
   const [replyOpen, setReplyOpen] = useState({})
+  const [isRecording, setIsRecording] = useState(false)
+  const [recordError, setRecordError] = useState('')
+
+  const recRef = React.useRef({ stream: null, recorder: null, chunks: [] })
 
   const postFromState = location.state?.post || null
 
@@ -174,6 +207,122 @@ const PostDetail = () => {
 
   const badgeCount = Number(feed.activePostBadgeCount) || 0
 
+  useEffect(() => {
+    return () => {
+      const { recorder, stream } = recRef.current
+      try {
+        if (recorder && recorder.state !== 'inactive') recorder.stop()
+      } catch {
+        // ignore
+      }
+      if (stream) {
+        stream.getTracks().forEach((t) => t.stop())
+      }
+    }
+  }, [])
+
+  const blobToDataUrl = (blob) =>
+    new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onloadend = () => resolve(String(reader.result || ''))
+      reader.onerror = () => resolve('')
+      reader.readAsDataURL(blob)
+    })
+
+  const stopRecording = async () => {
+    const { recorder, stream } = recRef.current
+    if (recorder && recorder.state !== 'inactive') recorder.stop()
+    if (stream) stream.getTracks().forEach((t) => t.stop())
+    recRef.current.stream = null
+    recRef.current.recorder = null
+  }
+
+  const startRecording = async () => {
+    setRecordError('')
+    if (typeof window === 'undefined') return
+    if (!navigator?.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      setRecordError('Voice recording is not supported on this device/browser.')
+      return
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream)
+      recRef.current = { stream, recorder, chunks: [] }
+
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size) recRef.current.chunks.push(e.data)
+      }
+
+      recorder.onstop = async () => {
+        setIsRecording(false)
+        const chunks = recRef.current.chunks || []
+        const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' })
+        const dataUrl = await blobToDataUrl(blob)
+        if (!dataUrl) return
+
+        if (dataUrl.length > 2_500_000) {
+          setRecordError('Voice note too large. Record a shorter comment.')
+          return
+        }
+
+        const me = currentUser || { id: 'me', name: 'You', avatar: friends?.[0]?.avatar }
+        setComments((prev) => [
+          {
+            id: `${post.id}-c${prev.length + 1}`,
+            user: me,
+            text: '',
+            audioSrc: dataUrl,
+            createdAt: new Date().toISOString(),
+            replies: [],
+          },
+          ...prev,
+        ])
+
+        const stored = addPostComment({
+          postId: post.id,
+          text: '',
+          audioSrc: dataUrl,
+          authorId: me.id || 'me',
+          authorName: me.name || 'You',
+        })
+
+        ;(async () => {
+          try {
+            const thumb = await createSquareThumbDataUrlFromImageSrc({ src: post.postImg })
+            window.dispatchEvent(
+              new CustomEvent('hender:activity-circle', {
+                detail: {
+                  id: `comment-${post.id}-${Date.now()}`,
+                  name: 'Comment',
+                  avatar: thumb || post.postImg,
+                  avatarFull: post.postImg,
+                  badgeIcon: 'comment',
+                  activityType: 'comment',
+                  postId: post.id,
+                  createdAt: new Date().toISOString(),
+                  actorName: me.name || 'You',
+                  targetAuthorName: post.authorName || '',
+                  commentId: stored?.id || '',
+                  commentText: '[Voice comment]',
+                  commentAudioSrc: dataUrl,
+                },
+              })
+            )
+          } catch {
+            // ignore
+          }
+        })()
+      }
+
+      recorder.start(250)
+      setIsRecording(true)
+    } catch {
+      setRecordError('Microphone permission denied or unavailable.')
+      setIsRecording(false)
+      await stopRecording()
+    }
+  }
+
   return (
     <section className='relative h-full w-full bg-[var(--hx-app-bg)]'>
       <header className='sticky top-0 z-20 flex h-12 items-center gap-2 border-b border-[var(--hx-border)] bg-[var(--hx-surface)] px-2'>
@@ -229,13 +378,40 @@ const PostDetail = () => {
             ) : null}
 
             <div className='relative mt-2 overflow-hidden rounded border border-[var(--hx-border)] bg-[var(--hx-surface-2)]'>
-              <img
-                src={post.postImg}
-                alt='post'
-                className='h-[320px] w-full object-cover'
-                loading='lazy'
-                decoding='async'
-              />
+              {Array.isArray(post.media) && post.media.length > 0 ? (
+                <div className='no-scrollbar flex snap-x snap-mandatory overflow-x-auto'>
+                  {post.media.map((src, idx) => (
+                    <div key={`${idx + 1}-${String(src).slice(0, 18)}`} className='w-full shrink-0 snap-center'>
+                      {isVideoSrc(src) ? (
+                        <video
+                          src={src}
+                          className='h-[320px] w-full object-cover'
+                          controls
+                          playsInline
+                          preload='metadata'
+                        />
+                      ) : (
+                        <img
+                          src={src}
+                          alt={`post-${idx + 1}`}
+                          className='h-[320px] w-full object-cover'
+                          loading='lazy'
+                          decoding='async'
+                          draggable={false}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <img
+                  src={post.postImg}
+                  alt='post'
+                  className='h-[320px] w-full object-cover'
+                  loading='lazy'
+                  decoding='async'
+                />
+              )}
               {badgeCount > 0 ? (
                 <div className='absolute left-2 top-2 grid h-7 min-w-7 place-items-center rounded-full border border-[var(--hx-surface)] bg-[var(--hx-accent)] px-2 text-xs font-extrabold text-white shadow'>
                   {badgeCount}
@@ -319,7 +495,12 @@ const PostDetail = () => {
                             {formatShortTime(c.createdAt)}
                           </p>
                         </div>
-                        <p className='mt-1 text-sm leading-5 text-[var(--hx-text)]'>{c.text}</p>
+                        {c.audioSrc ? (
+                          <audio controls src={c.audioSrc} className='mt-2 w-full' />
+                        ) : null}
+                        {c.text ? (
+                          <p className='mt-1 text-sm leading-5 text-[var(--hx-text)]'>{c.text}</p>
+                        ) : null}
                         <div className='mt-2 flex items-center gap-3'>
                           <button
                             type='button'
@@ -468,6 +649,24 @@ const PostDetail = () => {
           />
           <button
             type='button'
+            aria-label={isRecording ? 'Stop recording' : 'Record voice comment'}
+            onClick={async () => {
+              if (isRecording) {
+                await stopRecording()
+              } else {
+                await startRecording()
+              }
+            }}
+            className={`grid h-10 w-10 place-items-center rounded-full border ${
+              isRecording
+                ? 'border-[rgba(228,0,110,0.35)] bg-[rgba(228,0,110,0.9)] text-white'
+                : 'border-[var(--hx-border)] bg-[var(--hx-surface)] text-[var(--hx-text)] hover:bg-[var(--hx-surface-2)]'
+            }`}
+          >
+            <MicIcon />
+          </button>
+          <button
+            type='button'
             aria-label='Send'
             disabled={!composer.trim()}
             onClick={() => {
@@ -523,6 +722,9 @@ const PostDetail = () => {
             <SendIcon />
           </button>
         </div>
+        {recordError ? (
+          <p className='mt-2 text-xs font-semibold text-[var(--hx-text-muted)]'>{recordError}</p>
+        ) : null}
       </div>
     </section>
   )

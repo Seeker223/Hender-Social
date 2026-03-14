@@ -125,13 +125,13 @@ const CreatePost = () => {
 
   const fileInputRef = useRef(null)
   const [html, setHtml] = useState('')
-  const [mediaDataUrl, setMediaDataUrl] = useState('')
+  const [mediaDataUrls, setMediaDataUrls] = useState([])
   const [isCompressing, setIsCompressing] = useState(false)
   const [isEmojiOpen, setIsEmojiOpen] = useState(false)
   const [error, setError] = useState('')
 
   const plainText = useMemo(() => stripTextFromHtml(html), [html])
-  const canPost = plainText.trim().length > 0 || !!mediaDataUrl
+  const canPost = plainText.trim().length > 0 || mediaDataUrls.length > 0
   const safeHtml = useMemo(() => sanitizeHtml(html), [html])
 
   const insertEmoji = (emoji) => {
@@ -225,19 +225,20 @@ const CreatePost = () => {
                 react: 0,
                 comments: 0,
                 views: 0,
-                postImg: mediaDataUrl || me.avatar,
+                postImg: mediaDataUrls[0] || me.avatar,
+                media: mediaDataUrls,
                 createdAt: now,
               }
               addMockPost(post)
 
               // If the post has media, surface it immediately in Top circles (unshift).
-                if (mediaDataUrl && typeof window !== 'undefined') {
-                  const thumb = await createCircleThumbFromJpegDataUrl(mediaDataUrl)
+                if (mediaDataUrls[0] && typeof window !== 'undefined') {
+                  const thumb = await createCircleThumbFromJpegDataUrl(mediaDataUrls[0])
                   const circle = {
                     id: `post-${id}`,
                     name: me.name || 'You',
                     avatar: thumb,
-                    avatarFull: mediaDataUrl,
+                    avatarFull: mediaDataUrls[0],
                     badgeIcon: 'post',
                     activityType: 'post',
                     postId: post.id,
@@ -411,7 +412,7 @@ const CreatePost = () => {
               className='flex items-center gap-2 rounded-full border border-[var(--hx-border)] bg-[var(--hx-surface)] px-3 py-2 text-sm font-semibold text-[var(--hx-text)] hover:bg-[var(--hx-surface-2)]'
             >
               <ImageIcon />
-              Add photo
+              Add photos
             </button>
           </div>
 
@@ -419,15 +420,29 @@ const CreatePost = () => {
             ref={fileInputRef}
             type='file'
             accept='image/*'
+            multiple
             className='hidden'
             onChange={async (e) => {
-              const file = e.target.files?.[0]
-              if (!file) return
+              const picked = Array.from(e.target.files || [])
+              e.target.value = ''
+              if (!picked.length) return
               setError('')
               setIsCompressing(true)
               try {
-                const dataUrl = await compressImageToJpegDataUrl(file)
-                setMediaDataUrl(dataUrl)
+                const maxTotal = 6
+                const keep = Math.max(0, maxTotal - mediaDataUrls.length)
+                const files = picked.slice(0, keep)
+                const next = []
+                for (const file of files) {
+                  // Only images for now.
+                  if (!file.type.startsWith('image/')) continue
+                  // eslint-disable-next-line no-await-in-loop
+                  const dataUrl = await compressImageToJpegDataUrl(file)
+                  next.push(dataUrl)
+                }
+                if (next.length) {
+                  setMediaDataUrls((prev) => [...prev, ...next].slice(0, maxTotal))
+                }
               } catch {
                 setError('Could not read this image. Try a different photo.')
               } finally {
@@ -442,17 +457,33 @@ const CreatePost = () => {
             </div>
           ) : null}
 
-          {mediaDataUrl ? (
+          {mediaDataUrls.length ? (
             <div className='relative mt-2 overflow-hidden rounded-xl border border-[var(--hx-border)] bg-[var(--hx-surface-2)]'>
-              <img src={mediaDataUrl} alt='preview' className='h-[260px] w-full object-cover' />
+              <div className='no-scrollbar flex snap-x snap-mandatory overflow-x-auto'>
+                {mediaDataUrls.map((src, idx) => (
+                  <div key={`${src.slice(0, 24)}-${idx + 1}`} className='relative w-full shrink-0 snap-center'>
+                    <img src={src} alt={`preview-${idx + 1}`} className='h-[260px] w-full object-cover' />
+                    <button
+                      type='button'
+                      aria-label='Remove image'
+                      onClick={() => setMediaDataUrls((prev) => prev.filter((_, i) => i !== idx))}
+                      className='absolute right-2 top-2 rounded-full bg-black/60 px-3 py-1 text-xs font-bold text-white'
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
               <button
                 type='button'
-                aria-label='Remove image'
-                onClick={() => setMediaDataUrl('')}
-                className='absolute right-2 top-2 rounded-full bg-black/60 px-3 py-1 text-xs font-bold text-white'
+                onClick={() => setMediaDataUrls([])}
+                className='absolute left-2 top-2 rounded-full bg-black/60 px-3 py-1 text-xs font-bold text-white'
               >
-                Remove
+                Clear all
               </button>
+              <div className='absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-xs font-bold text-white'>
+                {mediaDataUrls.length}/6
+              </div>
             </div>
           ) : null}
         </div>
@@ -480,8 +511,17 @@ const CreatePost = () => {
             )}
             <div className='mt-2 overflow-hidden rounded-xl border border-[var(--hx-border)] bg-[var(--hx-surface-2)]'>
               <div className='relative'>
-                {mediaDataUrl ? (
-                  <img src={mediaDataUrl} alt='preview media' className='h-[220px] w-full object-cover' />
+                {mediaDataUrls.length ? (
+                  <div className='no-scrollbar flex snap-x snap-mandatory overflow-x-auto'>
+                    {mediaDataUrls.map((src, idx) => (
+                      <img
+                        key={`${src.slice(0, 24)}-${idx + 1}`}
+                        src={src}
+                        alt={`preview-media-${idx + 1}`}
+                        className='h-[220px] w-full shrink-0 snap-center object-cover'
+                      />
+                    ))}
+                  </div>
                 ) : (
                   <div className='grid h-[220px] place-items-center text-sm text-[var(--hx-text-muted)]'>
                     Add a photo to enhance your post.

@@ -124,6 +124,25 @@ export const sendMessage = (friendId, text) => {
   return msg
 }
 
+export const sendAudioMessage = (friendId, audioSrc) => {
+  const src = String(audioSrc || '').trim()
+  if (!src) return null
+  const threads = readThreads()
+  const t = threads[friendId] || { friendId, messages: [], unread: 0 }
+  const msg = {
+    id: `${friendId}-m${Date.now()}a`,
+    from: 'me',
+    text: '',
+    audioSrc: src,
+    createdAt: new Date().toISOString(),
+  }
+  t.messages = [...(t.messages || []), msg]
+  t.unread = 0
+  threads[friendId] = t
+  writeThreads(threads)
+  return msg
+}
+
 export const receiveMockReply = (friendId) => {
   const threads = readThreads()
   const t = threads[friendId]
@@ -148,4 +167,3 @@ export const receiveMockReply = (friendId) => {
   writeThreads(threads)
   return msg
 }
-

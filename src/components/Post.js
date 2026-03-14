@@ -131,6 +131,11 @@ const Post = (props) => {
     </Svg>
   )
 
+  const isVideoSrc = (src) => {
+    const s = String(src || '')
+    return s.startsWith('data:video/') || s.endsWith('.mp4') || s.endsWith('.webm')
+  }
+
   return (
     <article className='w-full border-b border-[var(--hx-border)] bg-[var(--hx-surface)] pb-2'>
       <div className='flex items-center gap-2 px-1 py-1'>
@@ -159,14 +164,44 @@ const Post = (props) => {
       </div>
 
       <div className='relative mx-1 overflow-hidden border border-[var(--hx-border)] bg-[var(--hx-surface-2)]'>
-        <img
-          src={props.postImg ?? props.img}
-          className={`h-[240px] w-full object-cover ${canOpen ? 'cursor-pointer' : ''}`}
-          alt='post'
-          loading="lazy"
-          decoding="async"
-          onClick={() => props.onOpen?.()}
-        />
+        {Array.isArray(props.media) && props.media.length > 0 ? (
+          <div
+            className='no-scrollbar flex snap-x snap-mandatory overflow-x-auto'
+            onClick={() => props.onOpen?.()}
+          >
+            {props.media.map((src, idx) => (
+              <div key={`${idx + 1}-${String(src).slice(0, 18)}`} className='w-full shrink-0 snap-center'>
+                {isVideoSrc(src) ? (
+                  <video
+                    src={src}
+                    className={`h-[240px] w-full object-cover ${canOpen ? 'cursor-pointer' : ''}`}
+                    controls
+                    playsInline
+                    preload='metadata'
+                  />
+                ) : (
+                  <img
+                    src={src}
+                    className={`h-[240px] w-full object-cover ${canOpen ? 'cursor-pointer' : ''}`}
+                    alt={`post-${idx + 1}`}
+                    loading='lazy'
+                    decoding='async'
+                    draggable={false}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <img
+            src={props.postImg ?? props.img}
+            className={`h-[240px] w-full object-cover ${canOpen ? 'cursor-pointer' : ''}`}
+            alt='post'
+            loading='lazy'
+            decoding='async'
+            onClick={() => props.onOpen?.()}
+          />
+        )}
         {Number.isFinite(Number(props.badgeCount)) && Number(props.badgeCount) > 0 ? (
           <div className='absolute left-2 top-2 grid h-7 min-w-7 place-items-center rounded-full border border-[var(--hx-surface)] bg-[var(--hx-accent)] px-2 text-xs font-extrabold text-white shadow'>
             {Number(props.badgeCount)}

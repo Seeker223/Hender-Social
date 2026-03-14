@@ -330,6 +330,9 @@ const ActivityModal = ({ isOpen, activity, onClose }) => {
             <div className='mt-3 space-y-3'>
               <div className='rounded-2xl border border-[var(--hx-border)] bg-[var(--hx-surface-2)] p-3'>
                 <p className='text-xs font-extrabold text-[var(--hx-text)]'>Comment</p>
+                {activity.commentAudioSrc ? (
+                  <audio controls src={activity.commentAudioSrc} className='mt-2 w-full' />
+                ) : null}
                 <p className='mt-1 whitespace-pre-wrap break-words text-sm text-[var(--hx-text)]'>
                   {activity.commentText || 'Comment text not available.'}
                 </p>
@@ -363,7 +366,12 @@ const ActivityModal = ({ isOpen, activity, onClose }) => {
                               {c.createdAt ? formatTime(c.createdAt) : ''}
                             </p>
                           </div>
-                          <p className='mt-1 text-xs leading-5 text-[var(--hx-text)]'>{c.text}</p>
+                          {c.audioSrc ? (
+                            <audio controls src={c.audioSrc} className='mt-2 w-full' />
+                          ) : null}
+                          {c.text ? (
+                            <p className='mt-1 text-xs leading-5 text-[var(--hx-text)]'>{c.text}</p>
+                          ) : null}
                         </div>
                       ))}
                     </div>
@@ -382,6 +390,9 @@ const ActivityModal = ({ isOpen, activity, onClose }) => {
                 <p className='mt-1 text-sm text-[var(--hx-text)]'>
                   To: <span className='font-bold'>{activity.friendName || activity.friendId || 'Friend'}</span>
                 </p>
+                {activity.messageAudioSrc ? (
+                  <audio controls src={activity.messageAudioSrc} className='mt-2 w-full' />
+                ) : null}
                 <p className='mt-2 whitespace-pre-wrap break-words rounded-xl border border-[var(--hx-border)] bg-[var(--hx-surface)] p-2 text-sm text-[var(--hx-text)]'>
                   {activity.messageText || 'Message text not available.'}
                 </p>
