@@ -138,8 +138,8 @@ const Home = () => {
   }, [])
 
   return (
-    <section className='min-h-screen w-full bg-[var(--hx-app-bg)] py-2 sm:py-4'>
-      <div className='mx-auto h-[100dvh] max-h-[760px] w-full max-w-[390px] overflow-hidden border border-[#e4006e] bg-[var(--hx-surface)] shadow-lg'>
+    <section className='min-h-screen w-full py-2 sm:py-4'>
+      <div className='mx-auto h-[100dvh] max-h-[760px] w-full max-w-[390px] overflow-hidden rounded-[22px] border border-[var(--hx-border)] bg-[var(--hx-surface)] shadow-[var(--hx-frame-shadow)] ring-1 ring-[rgba(228,0,110,0.35)]'>
         <FeedProvider
           value={{
             activePostImg,

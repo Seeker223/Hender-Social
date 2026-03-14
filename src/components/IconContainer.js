@@ -159,7 +159,7 @@ const IconContainer = () => {
   }, [theme])
 
   return (
-    <nav className='flex h-12 items-center justify-between border-b border-[var(--hx-border)] bg-[var(--hx-surface)] px-2 text-[var(--hx-text)]'>
+    <nav className='sticky top-0 z-30 flex h-12 items-center justify-between border-b border-[var(--hx-border)] bg-[var(--hx-surface-glass)] px-2 text-[var(--hx-text)] supports-[backdrop-filter]:backdrop-blur-md'>
       <Item to='/home/left' label='Home'><HomeIcon /></Item>
       <Item to='/home/likes' label='Notifications'><BellIcon /></Item>
       <Item to='/home/messages' label='Messages'><MessageIcon /></Item>

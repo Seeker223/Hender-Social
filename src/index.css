@@ -11,7 +11,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   @apply bg-slate-200;
-  background-color: var(--hx-app-bg, #e2e8f0);
+  /* Atmosphere: subtle radial gradients (fast, no images) */
+  background:
+    radial-gradient(900px circle at 12% 8%, var(--hx-accent-bg) 0%, rgba(0, 0, 0, 0) 58%),
+    radial-gradient(700px circle at 92% 18%, rgba(228, 0, 110, 0.10) 0%, rgba(0, 0, 0, 0) 52%),
+    var(--hx-app-bg, #e2e8f0);
   color: var(--hx-text, #000);
 }
 
@@ -33,11 +37,13 @@ code {
   --hx-app-bg: #e2e8f0;
   --hx-surface: #ffffff;
   --hx-surface-2: #f2f2f2;
+  --hx-surface-glass: rgba(255, 255, 255, 0.82);
   --hx-text: #000;
   --hx-text-muted: rgba(0, 0, 0, 0.65);
   --hx-border: rgba(0, 0, 0, 0.12);
   --hx-accent: #e4006e;
   --hx-accent-bg: #ffe3f1;
+  --hx-frame-shadow: 0 18px 44px rgba(0, 0, 0, 0.18);
   color-scheme: light;
 }
 
@@ -45,10 +51,12 @@ code {
   --hx-app-bg: #0b0b0e;
   --hx-surface: #121218;
   --hx-surface-2: #1a1a24;
+  --hx-surface-glass: rgba(18, 18, 24, 0.82);
   --hx-text: #f3f3f3;
   --hx-text-muted: rgba(243, 243, 243, 0.7);
   --hx-border: rgba(243, 243, 243, 0.14);
   --hx-accent: #ff4aa0;
   --hx-accent-bg: rgba(255, 74, 160, 0.16);
+  --hx-frame-shadow: 0 18px 54px rgba(0, 0, 0, 0.55);
   color-scheme: dark;
 }
