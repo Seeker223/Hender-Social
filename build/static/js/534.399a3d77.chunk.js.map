@@ -1,1 +1,0 @@
-{"version":3,"file":"static/js/534.399a3d77.chunk.js","mappings":"wJAEA,MAMA,EANcA,KAEVC,EAAAA,EAAAA,KAAA,OAAAC,SAAK,S","sources":["components/Video.js"],"sourcesContent":["import React from 'react'\r\n\r\nconst Video = () => {\r\n  return (\r\n    <div>Video</div>\r\n  )\r\n}\r\n\r\nexport default Video"],"names":["Video","_jsx","children"],"sourceRoot":""}
