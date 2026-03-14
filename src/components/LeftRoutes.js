@@ -35,7 +35,7 @@ const LeftRoutes = ({ isLoading = false, activePostImg = null, activePostBadgeCo
 
   if (showSkeleton) {
     return (
-      <section className='h-full w-full overflow-y-auto bg-[var(--hx-app-bg)] p-1'>
+      <section className='h-full w-full bg-[var(--hx-app-bg)] p-1'>
         {Array.from({ length: 4 }).map((_, index) => (
           <article
             key={`post-skeleton-${index + 1}`}
@@ -52,7 +52,7 @@ const LeftRoutes = ({ isLoading = false, activePostImg = null, activePostBadgeCo
   }
 
   return (
-    <section className='h-full w-full overflow-y-auto bg-[var(--hx-app-bg)]'>
+    <section className='h-full w-full bg-[var(--hx-app-bg)]'>
       <Post
         name='ztsambad'
         img={hlogo2}

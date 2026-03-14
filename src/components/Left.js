@@ -19,7 +19,7 @@ const Left = ({ isLoading = false, activePostImg = null, activePostBadgeCount = 
   const outlet = useOutlet()
 
   return (
-    <div className='h-full w-[calc(100%-58px)] overflow-y-auto bg-[var(--hx-surface-2)]'>
+    <div className='no-scrollbar h-full w-[calc(100%-58px)] overflow-y-auto bg-[var(--hx-surface-2)]'>
       <IconContainer />
       {outlet || (
         <LeftRoutes
