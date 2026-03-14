@@ -225,6 +225,7 @@ const CreatePost = () => {
                     activityType: 'post',
                     postId: post.id,
                     createdAt: now,
+                    actorName: me.name || 'You',
                   }
                   window.localStorage.setItem('hender_last_post_circle', JSON.stringify(circle))
                   window.dispatchEvent(new CustomEvent('hender:new-post-circle', { detail: circle }))

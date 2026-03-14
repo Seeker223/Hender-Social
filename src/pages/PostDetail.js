@@ -4,6 +4,7 @@ import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
 import { useFeed } from '../context/FeedContext'
 import { sanitizeHtml } from '../utils/sanitizeHtml'
 import { createSquareThumbDataUrlFromImageSrc } from '../utils/thumbs'
+import { addPostComment } from '../mock/commentsMock'
 
 const Svg = ({ children }) => (
   <svg
@@ -261,6 +262,8 @@ const PostDetail = () => {
                           activityType: 'reaction',
                           postId: post.id,
                           createdAt: new Date().toISOString(),
+                          actorName: currentUser?.name || 'You',
+                          targetAuthorName: post.authorName || '',
                         },
                       })
                     )
@@ -371,6 +374,41 @@ const PostDetail = () => {
                                   )
                                 )
                                 setReplyDrafts((prev) => ({ ...prev, [c.id]: '' }))
+
+                                const stored = addPostComment({
+                                  postId: post.id,
+                                  text,
+                                  authorId: me.id || 'me',
+                                  authorName: me.name || 'You',
+                                  parentId: c.id,
+                                })
+
+                                ;(async () => {
+                                  try {
+                                    const thumb = await createSquareThumbDataUrlFromImageSrc({ src: post.postImg })
+                                    window.dispatchEvent(
+                                      new CustomEvent('hender:activity-circle', {
+                                        detail: {
+                                          id: `comment-${post.id}-${Date.now()}`,
+                                          name: 'Comment',
+                                          avatar: thumb || post.postImg,
+                                          avatarFull: post.postImg,
+                                          badgeIcon: 'comment',
+                                          activityType: 'comment',
+                                          postId: post.id,
+                                          createdAt: new Date().toISOString(),
+                                          actorName: me.name || 'You',
+                                          targetAuthorName: post.authorName || '',
+                                          commentId: stored?.id || '',
+                                          commentText: text,
+                                          parentCommentId: c.id,
+                                        },
+                                      })
+                                    )
+                                  } catch {
+                                    // ignore
+                                  }
+                                })()
                               }}
                               className='grid h-9 w-9 place-items-center rounded-full bg-[var(--hx-accent)] text-white disabled:opacity-60'
                             >
@@ -447,6 +485,12 @@ const PostDetail = () => {
                 ...prev,
               ])
               setComposer('')
+              const stored = addPostComment({
+                postId: post.id,
+                text,
+                authorId: me.id || 'me',
+                authorName: me.name || 'You',
+              })
 
               ;(async () => {
                 try {
@@ -462,6 +506,10 @@ const PostDetail = () => {
                         activityType: 'comment',
                         postId: post.id,
                         createdAt: new Date().toISOString(),
+                        actorName: me.name || 'You',
+                        targetAuthorName: post.authorName || '',
+                        commentId: stored?.id || '',
+                        commentText: text,
                       },
                     })
                   )

@@ -206,6 +206,8 @@ const Post = (props) => {
                     activityType: 'reaction',
                     postId: props.postId || null,
                     createdAt: new Date().toISOString(),
+                    actorName: 'You',
+                    targetAuthorName: props.name || '',
                   },
                 })
               )

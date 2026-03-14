@@ -340,6 +340,9 @@ const Message = () => {
                       activityType: 'chat',
                       friendId: activeFriend.id,
                       createdAt: new Date().toISOString(),
+                      actorName: meName,
+                      friendName: activeFriend.name || '',
+                      messageText: msg.text,
                     },
                   })
                 )

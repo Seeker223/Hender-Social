@@ -347,6 +347,10 @@ const Video = () => {
                                   activityType: 'video',
                                   videoId: item.id,
                                   createdAt: new Date().toISOString(),
+                                  actorName: 'You',
+                                  authorName: item.authorName,
+                                  caption: item.caption,
+                                  videoSrc: item.src,
                                 },
                               })
                             )
@@ -362,6 +366,10 @@ const Video = () => {
                                   activityType: 'video',
                                   videoId: item.id,
                                   createdAt: new Date().toISOString(),
+                                  actorName: 'You',
+                                  authorName: item.authorName,
+                                  caption: item.caption,
+                                  videoSrc: item.src,
                                 },
                               })
                             )
