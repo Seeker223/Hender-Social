@@ -2,9 +2,12 @@ import React, { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
 import { addMockPost } from '../mock/postsMock'
-import ReactQuill from 'react-quill'
-import 'react-quill/dist/quill.snow.css'
 import { sanitizeHtml } from '../utils/sanitizeHtml'
+import { EditorContent, useEditor } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Link from '@tiptap/extension-link'
+import Underline from '@tiptap/extension-underline'
+import Placeholder from '@tiptap/extension-placeholder'
 
 const Svg = ({ children }) => (
   <svg
@@ -119,7 +122,6 @@ const CreatePost = () => {
   const me = currentUser || { id: 'me', name: 'You', avatar: friends?.[0]?.avatar }
 
   const fileInputRef = useRef(null)
-  const quillRef = useRef(null)
   const [html, setHtml] = useState('')
   const [mediaDataUrl, setMediaDataUrl] = useState('')
   const [isCompressing, setIsCompressing] = useState(false)
@@ -130,35 +132,52 @@ const CreatePost = () => {
   const canPost = plainText.trim().length > 0 || !!mediaDataUrl
   const safeHtml = useMemo(() => sanitizeHtml(html), [html])
 
-  const quillModules = useMemo(
-    () => ({
-      toolbar: [
-        [{ header: [false, 2, 3] }],
-        ['bold', 'italic', 'underline'],
-        [{ list: 'ordered' }, { list: 'bullet' }],
-        ['link'],
-        ['clean'],
-      ],
-    }),
-    []
-  )
-
-  const quillFormats = useMemo(
-    () => ['header', 'bold', 'italic', 'underline', 'list', 'bullet', 'link'],
-    []
-  )
-
   const insertEmoji = (emoji) => {
-    const quill = quillRef.current?.getEditor?.()
-    if (!quill) {
-      setHtml((prev) => `${prev}${emoji}`)
-      return
-    }
-    const sel = quill.getSelection(true)
-    const index = sel?.index ?? quill.getLength()
-    quill.insertText(index, emoji, 'user')
-    quill.setSelection(index + emoji.length, 0, 'user')
+    editor?.chain().focus().insertContent(emoji).run()
   }
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: { levels: [2, 3] },
+      }),
+      Underline,
+      Link.configure({
+        openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
+      }),
+      Placeholder.configure({
+        placeholder: "What's happening?",
+      }),
+    ],
+    content: '',
+    editorProps: {
+      attributes: {
+        class:
+          'min-h-[120px] px-3 py-3 text-sm leading-6 outline-none hx-rich',
+      },
+    },
+    onUpdate: ({ editor: ed }) => {
+      setHtml(ed.getHTML())
+    },
+  })
+
+  const ToolbarButton = ({ active, disabled, onClick, children, label }) => (
+    <button
+      type='button'
+      aria-label={label}
+      disabled={disabled}
+      onClick={onClick}
+      className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+        active
+          ? 'border-[rgba(228,0,110,0.35)] bg-[var(--hx-accent-bg)] text-[var(--hx-accent)]'
+          : 'border-[var(--hx-border)] bg-[var(--hx-surface)] text-[var(--hx-text)] hover:bg-[var(--hx-surface-2)]'
+      } disabled:opacity-60`}
+    >
+      {children}
+    </button>
+  )
 
   return (
     <section className='h-full w-full bg-[var(--hx-app-bg)]'>
@@ -235,15 +254,78 @@ const CreatePost = () => {
           </div>
 
           <div className='mt-2 overflow-hidden rounded-lg border border-[var(--hx-border)] bg-[var(--hx-surface-2)]'>
-            <ReactQuill
-              ref={quillRef}
-              theme='snow'
-              value={html}
-              onChange={(v) => setHtml(v)}
-              modules={quillModules}
-              formats={quillFormats}
-              placeholder="What's happening?"
-            />
+            <div className='flex flex-wrap items-center gap-2 border-b border-[var(--hx-border)] bg-[var(--hx-surface)] p-2'>
+              <ToolbarButton
+                label='Heading'
+                active={editor?.isActive('heading', { level: 2 })}
+                disabled={!editor}
+                onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+              >
+                H2
+              </ToolbarButton>
+              <ToolbarButton
+                label='Bold'
+                active={editor?.isActive('bold')}
+                disabled={!editor}
+                onClick={() => editor?.chain().focus().toggleBold().run()}
+              >
+                Bold
+              </ToolbarButton>
+              <ToolbarButton
+                label='Italic'
+                active={editor?.isActive('italic')}
+                disabled={!editor}
+                onClick={() => editor?.chain().focus().toggleItalic().run()}
+              >
+                Italic
+              </ToolbarButton>
+              <ToolbarButton
+                label='Underline'
+                active={editor?.isActive('underline')}
+                disabled={!editor}
+                onClick={() => editor?.chain().focus().toggleUnderline().run()}
+              >
+                Underline
+              </ToolbarButton>
+              <ToolbarButton
+                label='Bullets'
+                active={editor?.isActive('bulletList')}
+                disabled={!editor}
+                onClick={() => editor?.chain().focus().toggleBulletList().run()}
+              >
+                Bullets
+              </ToolbarButton>
+              <ToolbarButton
+                label='Numbered list'
+                active={editor?.isActive('orderedList')}
+                disabled={!editor}
+                onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+              >
+                Numbered
+              </ToolbarButton>
+              <ToolbarButton
+                label='Link'
+                active={editor?.isActive('link')}
+                disabled={!editor}
+                onClick={() => {
+                  const url = window.prompt('Paste link URL')
+                  if (!url) return
+                  editor?.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+                }}
+              >
+                Link
+              </ToolbarButton>
+              <ToolbarButton
+                label='Clear formatting'
+                active={false}
+                disabled={!editor}
+                onClick={() => editor?.chain().focus().clearNodes().unsetAllMarks().run()}
+              >
+                Clear
+              </ToolbarButton>
+            </div>
+
+            <EditorContent editor={editor} />
           </div>
 
           <div className='mt-2 flex items-center justify-between gap-2'>

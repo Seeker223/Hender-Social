@@ -53,47 +53,13 @@ code {
   margin: 0.25rem 0;
 }
 
-/* React-Quill theming (Snow) */
-.ql-toolbar.ql-snow {
-  border: 0;
-  border-bottom: 1px solid var(--hx-border);
-  background: var(--hx-surface);
-}
-
-.ql-container.ql-snow {
-  border: 0;
-  background: var(--hx-surface-2);
-  color: var(--hx-text);
-}
-
-.ql-editor {
-  min-height: 110px;
-  padding: 12px;
-  font-size: 14px;
-  line-height: 1.45;
-}
-
-.ql-snow .ql-stroke {
-  stroke: var(--hx-text);
-}
-
-.ql-snow .ql-fill {
-  fill: var(--hx-text);
-}
-
-.ql-snow .ql-picker {
-  color: var(--hx-text);
-}
-
-.ql-snow .ql-picker-options {
-  background: var(--hx-surface);
-  border-color: var(--hx-border);
-}
-
-.ql-snow .ql-tooltip {
-  background: var(--hx-surface);
-  border-color: var(--hx-border);
-  color: var(--hx-text);
+/* TipTap placeholder */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--hx-text-muted);
+  pointer-events: none;
+  height: 0;
 }
 
 :root {
