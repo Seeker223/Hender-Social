@@ -98,7 +98,12 @@ const Home = () => {
 
     const onNew = (event) => applyCircle(event?.detail)
     window.addEventListener('hender:new-post-circle', onNew)
-    return () => window.removeEventListener('hender:new-post-circle', onNew)
+    const onActivity = (event) => applyCircle(event?.detail)
+    window.addEventListener('hender:activity-circle', onActivity)
+    return () => {
+      window.removeEventListener('hender:new-post-circle', onNew)
+      window.removeEventListener('hender:activity-circle', onActivity)
+    }
   }, [])
 
   const handleRightScrollDown = useCallback((count = 1) => {

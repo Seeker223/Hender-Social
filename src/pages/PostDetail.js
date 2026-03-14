@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
 import { useFeed } from '../context/FeedContext'
 import { sanitizeHtml } from '../utils/sanitizeHtml'
+import { createSquareThumbDataUrlFromImageSrc } from '../utils/thumbs'
 
 const Svg = ({ children }) => (
   <svg
@@ -245,7 +246,23 @@ const PostDetail = () => {
               <button
                 type='button'
                 aria-label='Like'
-                onClick={() => setLiked((v) => !v)}
+                onClick={() => {
+                  const next = !liked
+                  setLiked(next)
+                  if (next && typeof window !== 'undefined') {
+                    window.dispatchEvent(
+                      new CustomEvent('hender:activity-circle', {
+                        detail: {
+                          id: `reaction-${post.id}-${Date.now()}`,
+                          name: 'Reaction',
+                          avatar: post.postImg,
+                          avatarFull: post.postImg,
+                          badgeIcon: 'reaction',
+                        },
+                      })
+                    )
+                  }
+                }}
                 className={`flex items-center gap-1 rounded px-2 py-1 transition-colors ${
                   liked ? 'text-[var(--hx-accent)]' : 'text-[var(--hx-text)]'
                 }`}
@@ -422,10 +439,30 @@ const PostDetail = () => {
                   user: me,
                   text,
                   createdAt: new Date().toISOString(),
+                  replies: [],
                 },
                 ...prev,
               ])
               setComposer('')
+
+              ;(async () => {
+                try {
+                  const thumb = await createSquareThumbDataUrlFromImageSrc({ src: post.postImg })
+                  window.dispatchEvent(
+                    new CustomEvent('hender:activity-circle', {
+                      detail: {
+                        id: `comment-${post.id}-${Date.now()}`,
+                        name: 'Comment',
+                        avatar: thumb || post.postImg,
+                        avatarFull: post.postImg,
+                        badgeIcon: 'comment',
+                      },
+                    })
+                  )
+                } catch {
+                  // ignore
+                }
+              })()
             }}
             className='grid h-10 w-10 place-items-center rounded-full bg-[var(--hx-accent)] text-white disabled:cursor-not-allowed disabled:opacity-60'
           >

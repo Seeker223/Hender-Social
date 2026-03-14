@@ -191,8 +191,22 @@ const Post = (props) => {
           active={liked}
           label='Like'
           onClick={() => {
-            setLiked((v) => !v)
+            const next = !liked
+            setLiked(next)
             setDisliked(false)
+            if (next && typeof window !== 'undefined') {
+              window.dispatchEvent(
+                new CustomEvent('hender:activity-circle', {
+                  detail: {
+                    id: `reaction-${props.postId || 'post'}-${Date.now()}`,
+                    name: 'Reaction',
+                    avatar: props.postImg ?? props.img,
+                    avatarFull: props.postImg ?? props.img,
+                    badgeIcon: 'reaction',
+                  },
+                })
+              )
+            }
           }}
         >
           <LikeIcon active={liked} />

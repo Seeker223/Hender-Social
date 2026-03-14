@@ -67,6 +67,7 @@ const LeftRoutes = ({ isLoading = false, activePostImg = null, activePostBadgeCo
       {postsWithActiveMedia.map((post) => (
         <Post
           key={post.id}
+          postId={post.id}
           name={post.authorName}
           img={post.authorAvatar}
           postImg={post.postImg}

@@ -3,6 +3,7 @@ import parrots from '../assets/parrots.mp4'
 import river from '../assets/river.mp4'
 import yviyc0jsucjgy98gjthy from '../assets/yviyc0jsucjgy98gjthy.mp4'
 import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
+import { createSquareThumbDataUrlFromVideoSrc } from '../utils/thumbs'
 
 const Svg = ({ children }) => (
   <svg
@@ -328,7 +329,40 @@ const Video = () => {
                   <button
                     type='button'
                     aria-label='Like'
-                    onClick={() => setLikedById((prev) => ({ ...prev, [item.id]: !liked }))}
+                    onClick={() => {
+                      const next = !liked
+                      setLikedById((prev) => ({ ...prev, [item.id]: next }))
+                      if (next && typeof window !== 'undefined') {
+                        ;(async () => {
+                          try {
+                            const thumb = await createSquareThumbDataUrlFromVideoSrc({ src: item.src })
+                            window.dispatchEvent(
+                              new CustomEvent('hender:activity-circle', {
+                                detail: {
+                                  id: `video-${item.id}-${Date.now()}`,
+                                  name: 'Video',
+                                  avatar: thumb || item.authorAvatar,
+                                  avatarFull: thumb || item.authorAvatar,
+                                  badgeIcon: 'video',
+                                },
+                              })
+                            )
+                          } catch {
+                            window.dispatchEvent(
+                              new CustomEvent('hender:activity-circle', {
+                                detail: {
+                                  id: `video-${item.id}-${Date.now()}`,
+                                  name: 'Video',
+                                  avatar: item.authorAvatar,
+                                  avatarFull: item.authorAvatar,
+                                  badgeIcon: 'video',
+                                },
+                              })
+                            )
+                          }
+                        })()
+                      }
+                    }}
                     className={`grid h-11 w-11 place-items-center rounded-full border transition-colors ${
                       liked
                         ? 'border-[rgba(255,255,255,0.35)] bg-[rgba(228,0,110,0.9)] text-white'

@@ -328,6 +328,19 @@ const Message = () => {
               setDraft('')
               setThreadTick((t) => t + 1)
               setIsTyping(true)
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(
+                  new CustomEvent('hender:activity-circle', {
+                    detail: {
+                      id: `chat-${activeFriend.id}-${Date.now()}`,
+                      name: 'Chat',
+                      avatar: activeFriend.avatar,
+                      avatarFull: activeFriend.avatarFull || activeFriend.avatar,
+                      badgeIcon: 'chat',
+                    },
+                  })
+                )
+              }
               window.setTimeout(() => {
                 receiveMockReply(activeFriend.id)
                 setIsTyping(false)
