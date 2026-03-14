@@ -22,10 +22,21 @@ const Home = () => {
   const [selectedActivity, setSelectedActivity] = useState(null)
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false)
 
+  const badgeMediaCount = useMemo(() => {
+    return (circleState.badge || []).reduce((acc, item) => {
+      if (item?.avatarFull || item?.avatar) return acc + 1
+      return acc
+    }, 0)
+  }, [circleState.badge])
+
   const activePostImg = useMemo(() => {
-    if (circleState.badge.length === 0) return null
-    const last = circleState.badge[circleState.badge.length - 1]
-    return last?.avatarFull ?? last?.avatar ?? null
+    const badge = circleState.badge || []
+    for (let i = badge.length - 1; i >= 0; i -= 1) {
+      const it = badge[i]
+      const src = it?.avatarFull ?? it?.avatar ?? null
+      if (src) return src
+    }
+    return null
   }, [circleState.badge])
 
   useEffect(() => {
@@ -142,24 +153,12 @@ const Home = () => {
         const movedFromRight = right.shift()
         if (!movedFromRight) break
 
-        if (top.length < 6) {
+        if (top.length === 0) {
           top.push(movedFromRight)
           continue
         }
 
-        // Keep emoji circles pinned in Top so they don't break the cart/badge pipeline.
-        const firstMovableIdx = (() => {
-          const idx = top.findIndex((c) => !c?.emoji)
-          return idx === -1 ? top.length : idx
-        })()
-
-        // If the entire Top row is emoji-pinned, don't cycle (put the right item back).
-        if (firstMovableIdx >= top.length) {
-          right.unshift(movedFromRight)
-          break
-        }
-
-        const movedFromTop = top.splice(firstMovableIdx, 1)[0]
+        const movedFromTop = top.shift()
         if (movedFromTop) badge.push(movedFromTop)
         top.push(movedFromRight)
       }
@@ -186,27 +185,9 @@ const Home = () => {
       for (let i = 0; i < cycles; i += 1) {
         if (badge.length === 0 || top.length === 0) break
         const restoredBadge = badge.pop()
-
-        const firstMovableIdx = (() => {
-          const idx = top.findIndex((c) => !c?.emoji)
-          return idx === -1 ? top.length : idx
-        })()
-        const lastMovableIdx = (() => {
-          for (let j = top.length - 1; j >= 0; j -= 1) {
-            if (!top[j]?.emoji) return j
-          }
-          return -1
-        })()
-
-        // No movable circles (only emoji pinned) => can't restore.
-        if (lastMovableIdx < 0 || firstMovableIdx >= top.length) {
-          if (restoredBadge) badge.push(restoredBadge)
-          break
-        }
-
-        const restoredFromTop = top.splice(lastMovableIdx, 1)[0]
+        const restoredFromTop = top.pop()
         if (restoredFromTop) right.unshift(restoredFromTop)
-        if (restoredBadge) top.splice(firstMovableIdx, 0, restoredBadge)
+        if (restoredBadge) top.unshift(restoredBadge)
       }
 
       return { top, right, badge }
@@ -237,15 +218,10 @@ const Home = () => {
   return (
     <section className='min-h-screen w-full py-2 sm:py-4'>
       <div className='mx-auto h-[100dvh] max-h-[760px] w-full max-w-[390px] overflow-hidden rounded-[22px] border border-[var(--hx-border)] bg-[var(--hx-surface)] shadow-[var(--hx-frame-shadow)] ring-1 ring-[rgba(228,0,110,0.35)]'>
-        <FeedProvider
-          value={{
-            activePostImg,
-            activePostBadgeCount: circleState.badge.length,
-          }}
-        >
+        <FeedProvider value={{ activePostImg, activePostBadgeCount: badgeMediaCount }}>
           <Top
             topCircles={circleState.top}
-            badgeCount={circleState.badge.length}
+            badgeCount={badgeMediaCount}
             isLoading={isCircleUiLoading}
             onCircleClick={handleCircleClick}
           />
@@ -255,7 +231,7 @@ const Home = () => {
             onRightScrollUp={handleRightScrollUp}
             isLoading={isCircleUiLoading}
             activePostImg={activePostImg}
-            activePostBadgeCount={circleState.badge.length}
+            activePostBadgeCount={badgeMediaCount}
             onRightCircleClick={handleCircleClick}
           />
         </FeedProvider>
