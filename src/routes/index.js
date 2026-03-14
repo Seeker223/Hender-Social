@@ -18,6 +18,7 @@ const Logout = lazy(() => import("../pages/Logout"))
 const Message = lazy(() => import("../pages/Message"))
 const Profile = lazy(() => import("../pages/Profile"))
 const CreatePost = lazy(() => import("../pages/CreatePost"))
+const PostDetail = lazy(() => import("../pages/PostDetail"))
 const Register = lazy(() => import("../pages/Register"))
 const SplashScreen = lazy(() => import("../pages/SplashScreen"))
 const Artificialintelligence = lazy(() => import("../pages/Artificialintelligence"))
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
           {
             path: "post",
             element: withSuspense(<CreatePost />),
+          },
+          {
+            path: "post/:postId",
+            element: withSuspense(<PostDetail />),
           },
         ],
       },

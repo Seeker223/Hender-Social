@@ -4,6 +4,7 @@ const Post = (props) => {
   const [liked, setLiked] = React.useState(false)
   const [disliked, setDisliked] = React.useState(false)
   const [reXended, setReXended] = React.useState(false)
+  const canOpen = typeof props.onOpen === 'function'
 
   const likeCount = Number.isFinite(Number(props.react)) ? Number(props.react) : 0
   const commentCount = Number.isFinite(Number(props.comments)) ? Number(props.comments) : 0
@@ -152,10 +153,11 @@ const Post = (props) => {
       <div className='relative mx-1 overflow-hidden border border-[var(--hx-border)] bg-[var(--hx-surface-2)]'>
         <img
           src={props.postImg ?? props.img}
-          className='h-[240px] w-full object-cover'
+          className={`h-[240px] w-full object-cover ${canOpen ? 'cursor-pointer' : ''}`}
           alt='post'
           loading="lazy"
           decoding="async"
+          onClick={() => props.onOpen?.()}
         />
         {Number.isFinite(Number(props.badgeCount)) && Number(props.badgeCount) > 0 ? (
           <div className='absolute left-2 top-2 grid h-7 min-w-7 place-items-center rounded-full border border-[var(--hx-surface)] bg-[var(--hx-accent)] px-2 text-xs font-extrabold text-white shadow'>
@@ -200,7 +202,7 @@ const Post = (props) => {
           <DislikeIcon active={disliked} />
         </IconButton>
 
-        <IconButton active={false} label='Comments' onClick={() => {}}>
+        <IconButton active={false} label='Comments' onClick={() => props.onOpen?.()}>
           <CommentIcon />
           <span className='text-xs font-semibold text-[var(--hx-text-muted)]'>{commentCount}</span>
         </IconButton>
