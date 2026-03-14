@@ -33,6 +33,69 @@ code {
   display: none;
 }
 
+/* Quill + rendered rich-text defaults (light/dark via CSS vars) */
+.hx-rich {
+  color: var(--hx-text);
+}
+
+.hx-rich a {
+  color: var(--hx-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.hx-rich ul,
+.hx-rich ol {
+  margin: 0.25rem 0 0.25rem 1.25rem;
+}
+
+.hx-rich p {
+  margin: 0.25rem 0;
+}
+
+/* React-Quill theming (Snow) */
+.ql-toolbar.ql-snow {
+  border: 0;
+  border-bottom: 1px solid var(--hx-border);
+  background: var(--hx-surface);
+}
+
+.ql-container.ql-snow {
+  border: 0;
+  background: var(--hx-surface-2);
+  color: var(--hx-text);
+}
+
+.ql-editor {
+  min-height: 110px;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.ql-snow .ql-stroke {
+  stroke: var(--hx-text);
+}
+
+.ql-snow .ql-fill {
+  fill: var(--hx-text);
+}
+
+.ql-snow .ql-picker {
+  color: var(--hx-text);
+}
+
+.ql-snow .ql-picker-options {
+  background: var(--hx-surface);
+  border-color: var(--hx-border);
+}
+
+.ql-snow .ql-tooltip {
+  background: var(--hx-surface);
+  border-color: var(--hx-border);
+  color: var(--hx-text);
+}
+
 :root {
   --hx-app-bg: #e2e8f0;
   --hx-surface: #ffffff;

@@ -72,6 +72,7 @@ const LeftRoutes = ({ isLoading = false, activePostImg = null, activePostBadgeCo
           postImg={post.postImg}
           badgeCount={post.badgeCount}
           text={post.text}
+          html={post.html}
           react={String(post.react ?? '')}
           comments={String(post.comments ?? '')}
           views={String(post.views ?? '')}

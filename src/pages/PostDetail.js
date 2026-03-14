@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
 import { useFeed } from '../context/FeedContext'
+import { sanitizeHtml } from '../utils/sanitizeHtml'
 
 const Svg = ({ children }) => (
   <svg
@@ -111,6 +112,8 @@ const PostDetail = () => {
   const [liked, setLiked] = useState(false)
   const [composer, setComposer] = useState('')
   const [comments, setComments] = useState([])
+  const [replyDrafts, setReplyDrafts] = useState({})
+  const [replyOpen, setReplyOpen] = useState({})
 
   const postFromState = location.state?.post || null
 
@@ -152,6 +155,17 @@ const PostDetail = () => {
             ? 'This is a solid idea. Keep going.'
             : 'Nice. Add more reactions and a share flow.',
       createdAt: new Date(Date.now() - (idx + 1) * 1000 * 60 * 12).toISOString(),
+      replies:
+        idx < 3
+          ? [
+              {
+                id: `${post.id}-c${idx + 1}-r1`,
+                user: friends[(idx + 3) % friends.length],
+                text: 'Agree. The UX is getting sharper.',
+                createdAt: new Date(Date.now() - (idx + 1) * 1000 * 60 * 6).toISOString(),
+              },
+            ]
+          : [],
     }))
     setComments(seed)
   }, [friends, post.id])
@@ -199,9 +213,16 @@ const PostDetail = () => {
               </div>
             </div>
 
-            {post.text ? (
+            {post.html || post.text ? (
               <div className='mt-2 rounded border border-[var(--hx-border)] bg-[var(--hx-surface)] p-2 text-sm leading-5 text-[var(--hx-text)]'>
-                {post.text}
+                {post.html ? (
+                  <div
+                    className='hx-rich'
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.html) }}
+                  />
+                ) : (
+                  post.text
+                )}
               </div>
             ) : null}
 
@@ -276,6 +297,99 @@ const PostDetail = () => {
                           </p>
                         </div>
                         <p className='mt-1 text-sm leading-5 text-[var(--hx-text)]'>{c.text}</p>
+                        <div className='mt-2 flex items-center gap-3'>
+                          <button
+                            type='button'
+                            className='text-xs font-semibold text-[var(--hx-accent)]'
+                            onClick={() =>
+                              setReplyOpen((prev) => ({ ...prev, [c.id]: !prev[c.id] }))
+                            }
+                          >
+                            Reply
+                          </button>
+                          {c.replies?.length ? (
+                            <span className='text-[10px] text-[var(--hx-text-muted)]'>
+                              {c.replies.length} repl{c.replies.length === 1 ? 'y' : 'ies'}
+                            </span>
+                          ) : null}
+                        </div>
+
+                        {replyOpen[c.id] ? (
+                          <div className='mt-2 flex items-center gap-2'>
+                            <input
+                              value={replyDrafts[c.id] || ''}
+                              onChange={(e) =>
+                                setReplyDrafts((prev) => ({ ...prev, [c.id]: e.target.value }))
+                              }
+                              placeholder='Write a reply...'
+                              className='h-9 w-full rounded-full border border-[var(--hx-border)] bg-[var(--hx-surface-2)] px-3 text-xs text-[var(--hx-text)] outline-none placeholder:text-[var(--hx-text-muted)] focus:border-[var(--hx-accent)]'
+                            />
+                            <button
+                              type='button'
+                              aria-label='Send reply'
+                              disabled={!(replyDrafts[c.id] || '').trim()}
+                              onClick={() => {
+                                const text = String(replyDrafts[c.id] || '').trim()
+                                if (!text) return
+                                const me = currentUser || { id: 'me', name: 'You', avatar: friends?.[0]?.avatar }
+                                setComments((prev) =>
+                                  prev.map((item) =>
+                                    item.id === c.id
+                                      ? {
+                                          ...item,
+                                          replies: [
+                                            {
+                                              id: `${c.id}-r${(item.replies?.length || 0) + 1}`,
+                                              user: me,
+                                              text,
+                                              createdAt: new Date().toISOString(),
+                                            },
+                                            ...(item.replies || []),
+                                          ],
+                                        }
+                                      : item
+                                  )
+                                )
+                                setReplyDrafts((prev) => ({ ...prev, [c.id]: '' }))
+                              }}
+                              className='grid h-9 w-9 place-items-center rounded-full bg-[var(--hx-accent)] text-white disabled:opacity-60'
+                            >
+                              <SendIcon />
+                            </button>
+                          </div>
+                        ) : null}
+
+                        {c.replies?.length ? (
+                          <div className='mt-2 space-y-2 pl-4'>
+                            {c.replies.map((r) => (
+                              <div
+                                key={r.id}
+                                className='rounded-lg border border-[var(--hx-border)] bg-[var(--hx-surface-2)] p-2'
+                              >
+                                <div className='flex items-start gap-2'>
+                                  <img
+                                    src={r.user?.avatar}
+                                    alt={r.user?.name}
+                                    className='h-8 w-8 rounded-full border border-[var(--hx-border)] object-cover'
+                                    loading='lazy'
+                                    decoding='async'
+                                  />
+                                  <div className='min-w-0 flex-1'>
+                                    <div className='flex items-center justify-between gap-2'>
+                                      <p className='truncate text-xs font-semibold text-[var(--hx-text)]'>
+                                        {r.user?.name}
+                                      </p>
+                                      <p className='shrink-0 text-[10px] text-[var(--hx-text-muted)]'>
+                                        {formatShortTime(r.createdAt)}
+                                      </p>
+                                    </div>
+                                    <p className='mt-1 text-xs leading-5 text-[var(--hx-text)]'>{r.text}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -286,7 +400,7 @@ const PostDetail = () => {
         )}
       </div>
 
-      <div className='absolute bottom-0 left-0 right-0 z-30 border-t border-[var(--hx-border)] bg-[var(--hx-surface)] p-2'>
+      <div className='sticky bottom-0 left-0 right-0 z-30 border-t border-[var(--hx-border)] bg-[var(--hx-surface)] p-2'>
         <div className='flex items-center gap-2'>
           <input
             value={composer}
@@ -324,4 +438,3 @@ const PostDetail = () => {
 }
 
 export default PostDetail
-

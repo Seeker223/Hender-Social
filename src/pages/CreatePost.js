@@ -2,6 +2,9 @@ import React, { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
 import { addMockPost } from '../mock/postsMock'
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
+import { sanitizeHtml } from '../utils/sanitizeHtml'
 
 const Svg = ({ children }) => (
   <svg
@@ -100,6 +103,15 @@ const createCircleThumbFromJpegDataUrl = async (jpegDataUrl) => {
   return canvas.toDataURL('image/jpeg', 0.6)
 }
 
+const stripTextFromHtml = (html) => {
+  if (typeof html !== 'string') return ''
+  if (typeof window === 'undefined' || typeof DOMParser === 'undefined') {
+    return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+  }
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  return (doc.body.textContent || '').replace(/\s+/g, ' ').trim()
+}
+
 const CreatePost = () => {
   const navigate = useNavigate()
   const currentUser = useMemo(() => getCurrentMockUser(), [])
@@ -107,12 +119,46 @@ const CreatePost = () => {
   const me = currentUser || { id: 'me', name: 'You', avatar: friends?.[0]?.avatar }
 
   const fileInputRef = useRef(null)
-  const [text, setText] = useState('')
+  const quillRef = useRef(null)
+  const [html, setHtml] = useState('')
   const [mediaDataUrl, setMediaDataUrl] = useState('')
   const [isCompressing, setIsCompressing] = useState(false)
+  const [isEmojiOpen, setIsEmojiOpen] = useState(false)
   const [error, setError] = useState('')
 
-  const canPost = text.trim().length > 0 || !!mediaDataUrl
+  const plainText = useMemo(() => stripTextFromHtml(html), [html])
+  const canPost = plainText.trim().length > 0 || !!mediaDataUrl
+  const safeHtml = useMemo(() => sanitizeHtml(html), [html])
+
+  const quillModules = useMemo(
+    () => ({
+      toolbar: [
+        [{ header: [false, 2, 3] }],
+        ['bold', 'italic', 'underline'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['link'],
+        ['clean'],
+      ],
+    }),
+    []
+  )
+
+  const quillFormats = useMemo(
+    () => ['header', 'bold', 'italic', 'underline', 'list', 'bullet', 'link'],
+    []
+  )
+
+  const insertEmoji = (emoji) => {
+    const quill = quillRef.current?.getEditor?.()
+    if (!quill) {
+      setHtml((prev) => `${prev}${emoji}`)
+      return
+    }
+    const sel = quill.getSelection(true)
+    const index = sel?.index ?? quill.getLength()
+    quill.insertText(index, emoji, 'user')
+    quill.setSelection(index + emoji.length, 0, 'user')
+  }
 
   return (
     <section className='h-full w-full bg-[var(--hx-app-bg)]'>
@@ -138,7 +184,8 @@ const CreatePost = () => {
                 id,
                 authorName: me.name || 'You',
                 authorAvatar: me.avatar,
-                text: text.trim(),
+                text: plainText.trim(),
+                html: safeHtml,
                 react: 0,
                 comments: 0,
                 views: 0,
@@ -187,15 +234,54 @@ const CreatePost = () => {
             </div>
           </div>
 
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="What's happening?"
-            rows={4}
-            className='mt-2 w-full resize-none rounded-lg border border-[var(--hx-border)] bg-[var(--hx-surface-2)] p-3 text-sm leading-5 text-[var(--hx-text)] outline-none placeholder:text-[var(--hx-text-muted)] focus:border-[var(--hx-accent)]'
-          />
+          <div className='mt-2 overflow-hidden rounded-lg border border-[var(--hx-border)] bg-[var(--hx-surface-2)]'>
+            <ReactQuill
+              ref={quillRef}
+              theme='snow'
+              value={html}
+              onChange={(v) => setHtml(v)}
+              modules={quillModules}
+              formats={quillFormats}
+              placeholder="What's happening?"
+            />
+          </div>
 
           <div className='mt-2 flex items-center justify-between gap-2'>
+            <div className='relative'>
+              <button
+                type='button'
+                aria-label='Emoji'
+                onClick={() => setIsEmojiOpen((v) => !v)}
+                className='rounded-full border border-[var(--hx-border)] bg-[var(--hx-surface)] px-3 py-2 text-sm font-semibold text-[var(--hx-text)] hover:bg-[var(--hx-surface-2)]'
+              >
+                Emoji
+              </button>
+              {isEmojiOpen ? (
+                <div className='absolute left-0 top-12 z-40 w-[240px] rounded-xl border border-[var(--hx-border)] bg-[var(--hx-surface)] p-2 shadow'>
+                  <div className='grid grid-cols-8 gap-1 text-base'>
+                    {['😀','😁','😂','😍','😮','😢','😡','🙏','🔥','💯','🎉','✨','❤️','👍','👎','🤝'].map((e) => (
+                      <button
+                        key={e}
+                        type='button'
+                        className='grid h-8 w-8 place-items-center rounded hover:bg-[var(--hx-surface-2)]'
+                        onClick={() => {
+                          insertEmoji(e)
+                          setIsEmojiOpen(false)
+                        }}
+                      >
+                        {e}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            <p className='text-xs text-[var(--hx-text-muted)]'>
+              {isCompressing ? 'Optimizing image...' : 'Fast upload (auto-compress)'}
+            </p>
+          </div>
+
+          <div className='mt-2'>
             <button
               type='button'
               onClick={() => fileInputRef.current?.click()}
@@ -204,9 +290,6 @@ const CreatePost = () => {
               <ImageIcon />
               Add photo
             </button>
-            <p className='text-xs text-[var(--hx-text-muted)]'>
-              {isCompressing ? 'Optimizing image...' : 'Fast upload (auto-compress)'}
-            </p>
           </div>
 
           <input
@@ -264,8 +347,11 @@ const CreatePost = () => {
               />
               <p className='text-sm font-semibold text-[var(--hx-text)]'>{me.name || 'You'}</p>
             </div>
-            {text.trim() ? (
-              <p className='mt-2 whitespace-pre-wrap text-sm leading-5 text-[var(--hx-text)]'>{text}</p>
+            {plainText.trim() ? (
+              <div
+                className='mt-2 hx-rich text-sm leading-5'
+                dangerouslySetInnerHTML={{ __html: safeHtml }}
+              />
             ) : (
               <p className='mt-2 text-sm text-[var(--hx-text-muted)]'>Your text will appear here.</p>
             )}

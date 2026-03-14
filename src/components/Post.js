@@ -1,4 +1,5 @@
 import React from 'react'
+import { sanitizeHtml } from '../utils/sanitizeHtml'
 
 const Post = (props) => {
   const [liked, setLiked] = React.useState(false)
@@ -146,8 +147,15 @@ const Post = (props) => {
         <p className='text-base font-semibold text-[var(--hx-text)]'>{props.name}</p>
       </div>
 
-      <div className='mx-1 mb-1 rounded border border-[var(--hx-border)] bg-[var(--hx-surface)] px-1 text-sm leading-5 text-[var(--hx-text)]'>
-        {props.text}
+      <div className='mx-1 mb-1 rounded border border-[var(--hx-border)] bg-[var(--hx-surface)] px-2 py-1 text-sm leading-5 text-[var(--hx-text)]'>
+        {props.html ? (
+          <div
+            className='hx-rich'
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(props.html) }}
+          />
+        ) : (
+          props.text
+        )}
       </div>
 
       <div className='relative mx-1 overflow-hidden border border-[var(--hx-border)] bg-[var(--hx-surface-2)]'>
