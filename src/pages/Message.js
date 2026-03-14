@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import Circle from '../components/Circle'
 import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
 import { ensureSeededThreads, getThread, listThreads, markRead, receiveMockReply, sendMessage } from '../mock/chatMock'
+import { emojiToDataUrl } from '../utils/emojiThumb'
 
 const Svg = ({ children }) => (
   <svg
@@ -140,10 +141,13 @@ const Message = () => {
   const meName = currentUser?.name || 'You'
   const emitEmojiCircle = (emoji) => {
     if (typeof window === 'undefined') return
+    const emojiImg = emojiToDataUrl(emoji, 512)
     const circle = {
       id: `emoji-${currentUser?.id || 'me'}-${Date.now()}`,
       name: meName,
       emoji,
+      avatar: emojiImg,
+      avatarFull: emojiImg,
       activityType: 'emoji',
       createdAt: new Date().toISOString(),
       actorName: meName,

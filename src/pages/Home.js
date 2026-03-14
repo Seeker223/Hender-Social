@@ -5,6 +5,7 @@ import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
 import UserModal from '../components/UserModal'
 import ActivityModal from '../components/ActivityModal'
 import { FeedProvider } from '../context/FeedContext'
+import { emojiToDataUrl } from '../utils/emojiThumb'
 
 const Home = () => {
   const currentUser = useMemo(() => getCurrentMockUser(), [])
@@ -22,21 +23,10 @@ const Home = () => {
   const [selectedActivity, setSelectedActivity] = useState(null)
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false)
 
-  const badgeMediaCount = useMemo(() => {
-    return (circleState.badge || []).reduce((acc, item) => {
-      if (item?.avatarFull || item?.avatar) return acc + 1
-      return acc
-    }, 0)
-  }, [circleState.badge])
-
   const activePostImg = useMemo(() => {
-    const badge = circleState.badge || []
-    for (let i = badge.length - 1; i >= 0; i -= 1) {
-      const it = badge[i]
-      const src = it?.avatarFull ?? it?.avatar ?? null
-      if (src) return src
-    }
-    return null
+    if (circleState.badge.length === 0) return null
+    const last = circleState.badge[circleState.badge.length - 1]
+    return last?.avatarFull ?? last?.avatar ?? null
   }, [circleState.badge])
 
   useEffect(() => {
@@ -113,7 +103,13 @@ const Home = () => {
     const savedEmoji = window.localStorage.getItem('hender_last_emoji_circle')
     if (savedEmoji) {
       try {
-        applyCircle(JSON.parse(savedEmoji))
+        const parsed = JSON.parse(savedEmoji)
+        if (parsed?.emoji && !parsed?.avatar) {
+          const emojiImg = emojiToDataUrl(parsed.emoji, 512)
+          applyCircle({ ...parsed, avatar: emojiImg, avatarFull: emojiImg })
+        } else {
+          applyCircle(parsed)
+        }
       } catch {
         // ignore
       }
@@ -218,10 +214,10 @@ const Home = () => {
   return (
     <section className='min-h-screen w-full py-2 sm:py-4'>
       <div className='mx-auto h-[100dvh] max-h-[760px] w-full max-w-[390px] overflow-hidden rounded-[22px] border border-[var(--hx-border)] bg-[var(--hx-surface)] shadow-[var(--hx-frame-shadow)] ring-1 ring-[rgba(228,0,110,0.35)]'>
-        <FeedProvider value={{ activePostImg, activePostBadgeCount: badgeMediaCount }}>
+        <FeedProvider value={{ activePostImg, activePostBadgeCount: circleState.badge.length }}>
           <Top
             topCircles={circleState.top}
-            badgeCount={badgeMediaCount}
+            badgeCount={circleState.badge.length}
             isLoading={isCircleUiLoading}
             onCircleClick={handleCircleClick}
           />
@@ -231,7 +227,7 @@ const Home = () => {
             onRightScrollUp={handleRightScrollUp}
             isLoading={isCircleUiLoading}
             activePostImg={activePostImg}
-            activePostBadgeCount={badgeMediaCount}
+            activePostBadgeCount={circleState.badge.length}
             onRightCircleClick={handleCircleClick}
           />
         </FeedProvider>

@@ -8,6 +8,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
+import { emojiToDataUrl } from '../utils/emojiThumb'
 
 const Svg = ({ children }) => (
   <svg
@@ -135,10 +136,13 @@ const CreatePost = () => {
   const insertEmoji = (emoji) => {
     editor?.chain().focus().insertContent(emoji).run()
     if (typeof window !== 'undefined') {
+      const emojiImg = emojiToDataUrl(emoji, 512)
       const circle = {
         id: `emoji-${me.id || 'me'}-${Date.now()}`,
         name: me.name || 'You',
         emoji,
+        avatar: emojiImg,
+        avatarFull: emojiImg,
         activityType: 'emoji',
         createdAt: new Date().toISOString(),
         actorName: me.name || 'You',
