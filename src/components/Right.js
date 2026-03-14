@@ -220,9 +220,10 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
             key={friend.id}
             size='h-11 w-11'
             src={friend.avatar}
+            emoji={friend.emoji || ''}
             name={friend.name}
             placeholder={isLoading}
-            showBadge={!isLoading}
+            showBadge={!isLoading && !friend.emoji}
             badgeIcon={friend.badgeIcon || ''}
             badgeKey={friend.id}
             payload={friend}

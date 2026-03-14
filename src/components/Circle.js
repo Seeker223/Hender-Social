@@ -23,6 +23,7 @@ const Circle = ({
   size = 'h-10 w-10',
   className = '',
   src = avatar,
+  emoji = '',
   name = 'avatar',
   fetchPriority = 'low',
   showBadge = false,
@@ -149,6 +150,13 @@ const Circle = ({
     >
       {placeholder ? (
         <div className='h-full w-full animate-pulse rounded-full border-2 border-[#ffd2e5] bg-[#f1f1f1]' />
+      ) : emoji ? (
+        <div
+          className='grid h-full w-full place-items-center rounded-full border-2 border-[#ff2c7b] bg-[var(--hx-surface-2)] text-[22px] leading-none'
+          title={emoji}
+        >
+          {emoji}
+        </div>
       ) : (
         <img
           src={src}

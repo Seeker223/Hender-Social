@@ -134,6 +134,18 @@ const CreatePost = () => {
 
   const insertEmoji = (emoji) => {
     editor?.chain().focus().insertContent(emoji).run()
+    if (typeof window !== 'undefined') {
+      const circle = {
+        id: `emoji-${me.id || 'me'}-${Date.now()}`,
+        name: me.name || 'You',
+        emoji,
+        activityType: 'emoji',
+        createdAt: new Date().toISOString(),
+        actorName: me.name || 'You',
+      }
+      window.localStorage.setItem('hender_last_emoji_circle', JSON.stringify(circle))
+      window.dispatchEvent(new CustomEvent('hender:emoji-circle', { detail: circle }))
+    }
   }
 
   const editor = useEditor({

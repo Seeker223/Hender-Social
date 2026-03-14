@@ -138,6 +138,19 @@ const Message = () => {
   }
 
   const meName = currentUser?.name || 'You'
+  const emitEmojiCircle = (emoji) => {
+    if (typeof window === 'undefined') return
+    const circle = {
+      id: `emoji-${currentUser?.id || 'me'}-${Date.now()}`,
+      name: meName,
+      emoji,
+      activityType: 'emoji',
+      createdAt: new Date().toISOString(),
+      actorName: meName,
+    }
+    window.localStorage.setItem('hender_last_emoji_circle', JSON.stringify(circle))
+    window.dispatchEvent(new CustomEvent('hender:emoji-circle', { detail: circle }))
+  }
 
   if (!activeFriend) {
     return (
@@ -306,7 +319,10 @@ const Message = () => {
                     key={e}
                     type='button'
                     className='grid h-8 w-8 place-items-center rounded-full hover:bg-[var(--hx-surface)]'
-                    onClick={() => setDraft((d) => `${d}${e}`)}
+                    onClick={() => {
+                      setDraft((d) => `${d}${e}`)
+                      emitEmojiCircle(e)
+                    }}
                   >
                     {e}
                   </button>

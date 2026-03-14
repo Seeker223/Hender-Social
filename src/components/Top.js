@@ -25,9 +25,10 @@ const Top = ({ topCircles = [], badgeCount = 0, isLoading = false, onCircleClick
             size='h-12 w-12'
             className='shrink-0'
             src={friend.avatar}
+            emoji={friend.emoji || ''}
             name={friend.name}
             placeholder={isLoading}
-            showBadge={!isLoading}
+            showBadge={!isLoading && !friend.emoji}
             badgeIcon={friend.badgeIcon || ''}
             badgeKey={friend.id}
             payload={friend}
