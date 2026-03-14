@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkclientend=self.webpackChunkclientend||[]).push([[837],{3837:(e,s,n)=>{n.r(s),n.d(s,{default:()=>u});var c=n(5043),t=n(7265),i=n(2339),l=n(9870),r=n(579);const u=()=>{const e=(0,t.Zp)();return(0,c.useEffect)((()=>{(0,l.W1)(),i.Ay.success("Signed out"),e("/login",{replace:!0})}),[e]),(0,r.jsx)("div",{className:"flex min-h-screen items-center justify-center",children:(0,r.jsx)("h1",{className:"text-lg font-semibold",children:"Signing out..."})})}}}]);
-//# sourceMappingURL=837.b4757f2b.chunk.js.map
