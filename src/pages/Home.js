@@ -68,6 +68,39 @@ const Home = () => {
     }
   }, [userFriends])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined
+    }
+
+    const applyCircle = (circle) => {
+      if (!circle || !circle.id || !circle.avatar) return
+      setCircleState((prev) => {
+        const existing = [...prev.top, ...prev.right].some((c) => c?.id === circle.id)
+        if (existing) return prev
+
+        const top = [circle, ...prev.top].slice(0, 6)
+        const overflow = [circle, ...prev.top].slice(6)
+        const right = overflow.length ? [...overflow, ...prev.right] : prev.right
+        return { ...prev, top, right }
+      })
+    }
+
+    // Restore last created post circle (in case of refresh).
+    const saved = window.localStorage.getItem('hender_last_post_circle')
+    if (saved) {
+      try {
+        applyCircle(JSON.parse(saved))
+      } catch {
+        // ignore
+      }
+    }
+
+    const onNew = (event) => applyCircle(event?.detail)
+    window.addEventListener('hender:new-post-circle', onNew)
+    return () => window.removeEventListener('hender:new-post-circle', onNew)
+  }, [])
+
   const handleRightScrollDown = useCallback((count = 1) => {
     if (isFriendsLoading) {
       return

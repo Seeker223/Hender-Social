@@ -79,6 +79,27 @@ const compressImageToJpegDataUrl = async (file) => {
   return canvas.toDataURL('image/jpeg', 0.5)
 }
 
+const createCircleThumbFromJpegDataUrl = async (jpegDataUrl) => {
+  const res = await fetch(jpegDataUrl)
+  const blob = await res.blob()
+  const bitmap = await createImageBitmap(blob)
+
+  const size = 96
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d', { alpha: false })
+
+  // Cover-crop to a square thumbnail.
+  const side = Math.min(bitmap.width, bitmap.height)
+  const sx = Math.max(0, Math.floor((bitmap.width - side) / 2))
+  const sy = Math.max(0, Math.floor((bitmap.height - side) / 2))
+  ctx.drawImage(bitmap, sx, sy, side, side, 0, 0, size, size)
+
+  // Keep this tiny for fast offrolling.
+  return canvas.toDataURL('image/jpeg', 0.6)
+}
+
 const CreatePost = () => {
   const navigate = useNavigate()
   const currentUser = useMemo(() => getCurrentMockUser(), [])
@@ -108,12 +129,13 @@ const CreatePost = () => {
         <button
           type='button'
           disabled={!canPost || isCompressing}
-          onClick={() => {
+          onClick={async () => {
             setError('')
             try {
               const now = new Date().toISOString()
+              const id = `u-${Date.now()}`
               const post = {
-                id: `u-${Date.now()}`,
+                id,
                 authorName: me.name || 'You',
                 authorAvatar: me.avatar,
                 text: text.trim(),
@@ -124,6 +146,20 @@ const CreatePost = () => {
                 createdAt: now,
               }
               addMockPost(post)
+
+              // If the post has media, surface it immediately in Top circles (unshift).
+              if (mediaDataUrl && typeof window !== 'undefined') {
+                const thumb = await createCircleThumbFromJpegDataUrl(mediaDataUrl)
+                const circle = {
+                  id: `post-${id}`,
+                  name: me.name || 'You',
+                  avatar: thumb,
+                  avatarFull: mediaDataUrl,
+                }
+                window.localStorage.setItem('hender_last_post_circle', JSON.stringify(circle))
+                window.dispatchEvent(new CustomEvent('hender:new-post-circle', { detail: circle }))
+              }
+
               navigate('/home/left')
             } catch (e) {
               setError('Could not create post. Try removing the image and posting text only.')
