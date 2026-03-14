@@ -214,17 +214,21 @@ const CreatePost = () => {
               addMockPost(post)
 
               // If the post has media, surface it immediately in Top circles (unshift).
-              if (mediaDataUrl && typeof window !== 'undefined') {
-                const thumb = await createCircleThumbFromJpegDataUrl(mediaDataUrl)
-                const circle = {
-                  id: `post-${id}`,
-                  name: me.name || 'You',
-                  avatar: thumb,
-                  avatarFull: mediaDataUrl,
+                if (mediaDataUrl && typeof window !== 'undefined') {
+                  const thumb = await createCircleThumbFromJpegDataUrl(mediaDataUrl)
+                  const circle = {
+                    id: `post-${id}`,
+                    name: me.name || 'You',
+                    avatar: thumb,
+                    avatarFull: mediaDataUrl,
+                    badgeIcon: 'post',
+                    activityType: 'post',
+                    postId: post.id,
+                    createdAt: now,
+                  }
+                  window.localStorage.setItem('hender_last_post_circle', JSON.stringify(circle))
+                  window.dispatchEvent(new CustomEvent('hender:new-post-circle', { detail: circle }))
                 }
-                window.localStorage.setItem('hender_last_post_circle', JSON.stringify(circle))
-                window.dispatchEvent(new CustomEvent('hender:new-post-circle', { detail: circle }))
-              }
 
               navigate('/home/left')
             } catch (e) {

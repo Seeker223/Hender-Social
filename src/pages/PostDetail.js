@@ -258,6 +258,9 @@ const PostDetail = () => {
                           avatar: post.postImg,
                           avatarFull: post.postImg,
                           badgeIcon: 'reaction',
+                          activityType: 'reaction',
+                          postId: post.id,
+                          createdAt: new Date().toISOString(),
                         },
                       })
                     )
@@ -456,6 +459,9 @@ const PostDetail = () => {
                         avatar: thumb || post.postImg,
                         avatarFull: post.postImg,
                         badgeIcon: 'comment',
+                        activityType: 'comment',
+                        postId: post.id,
+                        createdAt: new Date().toISOString(),
                       },
                     })
                   )

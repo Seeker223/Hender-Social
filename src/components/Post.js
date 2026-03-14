@@ -203,6 +203,9 @@ const Post = (props) => {
                     avatar: props.postImg ?? props.img,
                     avatarFull: props.postImg ?? props.img,
                     badgeIcon: 'reaction',
+                    activityType: 'reaction',
+                    postId: props.postId || null,
+                    createdAt: new Date().toISOString(),
                   },
                 })
               )

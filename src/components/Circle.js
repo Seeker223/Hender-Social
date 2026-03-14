@@ -118,6 +118,25 @@ const Circle = ({
       )
     }
 
+    if (kind === 'post') {
+      return (
+        <Svg>
+          <path
+            d='M8 3h8a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Z'
+            stroke='currentColor'
+            strokeWidth='2'
+            strokeLinejoin='round'
+          />
+          <path
+            d='M12 8v8M8 12h8'
+            stroke='currentColor'
+            strokeWidth='2'
+            strokeLinecap='round'
+          />
+        </Svg>
+      )
+    }
+
     return null
   }
 

@@ -223,6 +223,7 @@ const Right = ({ circles = [], onScrollDown, onScrollUp, isLoading = false, onCi
             name={friend.name}
             placeholder={isLoading}
             showBadge={!isLoading}
+            badgeIcon={friend.badgeIcon || ''}
             badgeKey={friend.id}
             payload={friend}
             onSelect={onCircleClick}

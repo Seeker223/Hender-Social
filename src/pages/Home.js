@@ -3,6 +3,7 @@ import Top from '../components/Top'
 import Bottom from '../components/Bottom'
 import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
 import UserModal from '../components/UserModal'
+import ActivityModal from '../components/ActivityModal'
 import { FeedProvider } from '../context/FeedContext'
 
 const Home = () => {
@@ -18,6 +19,8 @@ const Home = () => {
   const [areAvatarsReady, setAreAvatarsReady] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
   const [isUserModalOpen, setIsUserModalOpen] = useState(false)
+  const [selectedActivity, setSelectedActivity] = useState(null)
+  const [isActivityModalOpen, setIsActivityModalOpen] = useState(false)
 
   const activePostImg = useMemo(() => {
     if (circleState.badge.length === 0) return null
@@ -169,11 +172,25 @@ const Home = () => {
   }, [isFriendsLoading])
 
   const isCircleUiLoading = isFriendsLoading || !areAvatarsReady
+  const isActivityCircle = useCallback((circle) => {
+    if (!circle) return false
+    if (circle.activityType || circle.badgeIcon) return true
+    const id = circle.id
+    return typeof id === 'string' && /^(reaction|comment|chat|video|post)-/.test(id)
+  }, [])
+
   const handleCircleClick = useCallback((friend) => {
     if (!friend) return
+    if (isActivityCircle(friend)) {
+      setSelectedActivity(friend)
+      setIsActivityModalOpen(true)
+      setIsUserModalOpen(false)
+      return
+    }
     setSelectedUser(friend)
     setIsUserModalOpen(true)
-  }, [])
+    setIsActivityModalOpen(false)
+  }, [isActivityCircle])
 
   return (
     <section className='min-h-screen w-full py-2 sm:py-4'>
@@ -205,6 +222,11 @@ const Home = () => {
         isOpen={isUserModalOpen}
         user={selectedUser}
         onClose={() => setIsUserModalOpen(false)}
+      />
+      <ActivityModal
+        isOpen={isActivityModalOpen}
+        activity={selectedActivity}
+        onClose={() => setIsActivityModalOpen(false)}
       />
     </section>
   )

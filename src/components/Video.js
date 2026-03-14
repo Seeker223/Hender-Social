@@ -344,6 +344,9 @@ const Video = () => {
                                   avatar: thumb || item.authorAvatar,
                                   avatarFull: thumb || item.authorAvatar,
                                   badgeIcon: 'video',
+                                  activityType: 'video',
+                                  videoId: item.id,
+                                  createdAt: new Date().toISOString(),
                                 },
                               })
                             )
@@ -356,6 +359,9 @@ const Video = () => {
                                   avatar: item.authorAvatar,
                                   avatarFull: item.authorAvatar,
                                   badgeIcon: 'video',
+                                  activityType: 'video',
+                                  videoId: item.id,
+                                  createdAt: new Date().toISOString(),
                                 },
                               })
                             )

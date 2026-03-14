@@ -337,6 +337,9 @@ const Message = () => {
                       avatar: activeFriend.avatar,
                       avatarFull: activeFriend.avatarFull || activeFriend.avatar,
                       badgeIcon: 'chat',
+                      activityType: 'chat',
+                      friendId: activeFriend.id,
+                      createdAt: new Date().toISOString(),
                     },
                   })
                 )
