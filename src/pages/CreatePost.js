@@ -9,6 +9,7 @@ import Link from '@tiptap/extension-link'
 import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
 import { emojiToDataUrl } from '../utils/emojiThumb'
+import { NAIRALAND_GREEN_EMOJIS, NAIRALAND_GREEN_FACE_EMOJIS } from '../utils/emojiSets'
 
 const Svg = ({ children }) => (
   <svg
@@ -362,7 +363,26 @@ const CreatePost = () => {
               {isEmojiOpen ? (
                 <div className='absolute left-0 top-12 z-40 w-[240px] rounded-xl border border-[var(--hx-border)] bg-[var(--hx-surface)] p-2 shadow'>
                   <div className='grid grid-cols-8 gap-1 text-base'>
-                    {['😀','😁','😂','😍','😮','😢','😡','🙏','🔥','💯','🎉','✨','❤️','👍','👎','🤝'].map((e) => (
+                    {[
+                      ...NAIRALAND_GREEN_EMOJIS,
+                      ...NAIRALAND_GREEN_FACE_EMOJIS,
+                      '😀',
+                      '😁',
+                      '😂',
+                      '😍',
+                      '😮',
+                      '😢',
+                      '😡',
+                      '🙏',
+                      '🔥',
+                      '💯',
+                      '🎉',
+                      '✨',
+                      '❤️',
+                      '👍',
+                      '👎',
+                      '🤝',
+                    ].map((e) => (
                       <button
                         key={e}
                         type='button'

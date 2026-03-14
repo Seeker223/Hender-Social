@@ -4,6 +4,7 @@ import Circle from '../components/Circle'
 import { getCurrentMockUser, getFriendsForUser } from '../mock/authMock'
 import { ensureSeededThreads, getThread, listThreads, markRead, receiveMockReply, sendMessage } from '../mock/chatMock'
 import { emojiToDataUrl } from '../utils/emojiThumb'
+import { NAIRALAND_GREEN_EMOJIS, NAIRALAND_GREEN_FACE_EMOJIS } from '../utils/emojiSets'
 
 const Svg = ({ children }) => (
   <svg
@@ -318,7 +319,15 @@ const Message = () => {
             />
             <div className='mt-1 flex items-center justify-between'>
               <div className='flex items-center gap-1'>
-                {['😀', '🔥', '💯', '❤️', '👍'].map((e) => (
+                {[
+                  ...NAIRALAND_GREEN_EMOJIS.slice(0, 3),
+                  ...NAIRALAND_GREEN_FACE_EMOJIS.slice(0, 2),
+                  '😀',
+                  '🔥',
+                  '💯',
+                  '❤️',
+                  '👍',
+                ].map((e) => (
                   <button
                     key={e}
                     type='button'
